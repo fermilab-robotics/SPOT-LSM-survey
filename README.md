@@ -15,7 +15,7 @@ To be continued...
 ## Repository Code Component
 This repository is made up from the following code components: 
     1. Robot_state.py: this module is used to obtain the current robot state 
-    1. Location.py:this module includes method to obtain the Robot location, and establish April Tag requests
-    1.Main: all the necessary operations needed to obtain localization data from SPOT and serializing obtained data is included here.   
+    2. Location.py:this module includes method to obtain the Robot location, and establish April Tag requests
+    3. Main: all the necessary operations needed to obtain localization data from SPOT and serializing obtained data is included here.   
 
 
