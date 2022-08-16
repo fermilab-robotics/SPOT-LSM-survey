@@ -1,3 +1,8 @@
+'''
+This module is to test all the functions in Robot_state.py 
+'''
+
+
 import bosdyn.client.util
 from bosdyn.client import create_standard_sdk
 from bosdyn.client.robot_state import RobotStateClient 
@@ -9,23 +14,26 @@ from Robot_state import KRobotState
 #test for time sync 
 def TimeSyncTest(robot): 
     return robot.time_sync.wait_for_sync()
-#test for getting the robot current state, output to a text file. 
+#Obtain robot state report 
 def RobotStateTest(robot): 
     dummy= KRobotState(robot)
     with open("RobotstateReport.text",'w') as f:
         print(dummy.RobotState,file=f)
         f.close()
-#test for Transform SnapShot GET method 
+#test for GET method of Transform SnapShot 
 def XSnapShotTest(robot):
     dummy= KRobotState(robot) 
-    print(dummy.getTransformSnapshot()) 
-
-
-      
-
-
+    print(dummy.getTransformSnapshot())  
+#test for GET method of timestamp @ time of obtaining XSnapshot 
+def TimeStampTest(robot): 
+    dummy= KRobotState(robot)
+    print(dummy.GetTimeStamp()) 
 
     
+
+
+
+
 def main(argv):
     parser=argparse.ArgumentParser()
     bosdyn.client.util.add_base_arguments(parser)
@@ -34,9 +42,12 @@ def main(argv):
     sdk=create_standard_sdk('test')
     robot=sdk.create_robot(options.hostname)
     bosdyn.client.util.authenticate(robot)
-    #TimeSyncTest(robot)
-    #RobotStateTest(robot)
-    XSnapShotTest(robot)
+    #uncomment the corresponding function call for each test
+    #will change these to options passed to parsed CLI later...
+    #TimeSyncTest(robot)    
+    #RobotStateTest(robot)  
+    #XSnapShotTest(robot)
+    TimeStampTest(robot)
 
 
 if __name__ == '__main__':

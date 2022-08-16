@@ -1,65 +1,21 @@
-# Spot development environment
+# SPOT localization test refactored
+This is the repository for SPOT localtization test refactored. It follows the guideline for SPOT's development environment set up at: <https://github.com/fermilab-robotics/spot-dev-environment> 
 
-This is a template repository for Spot development. When used with VSCode and a container environment like Docker, this repo provides all the necessary components to interact with a Spot robot.
+## SPOT Frames 
+SPOT's location data is acquired in its Odom and Vision Frame. These data will then be transformed to SPOT's body frame. 
+Information about SPOT's Geometry and Frames: <https://dev.bostondynamics.com/docs/concepts/geometry_and_frames> 
 
-This project can then be deployed to Spot as-is. <https://dev.bostondynamics.com/docs/payload/docker_containers.html>
+## April Tag 
+SPOT is capable of detecting AprilTag using robot's base cameras and retrieve the data into its object frame. AprilTag is a fiducial object that SPOT uses as ground truth reference object. Data obtained from object frame as AprilTag is detected will also be then transformed to SPOT's body frame 
 
-## Getting started
+## Localization Test Goal 
+SPOT localizes itself via a system of points and edges. 
+To be continued... 
 
-VSCode and a container environment is required for this to work.
+## Repository Code Component
+This repository is made up from the following code components: 
+    1. Robot_state.py: this module is used to obtain the current robot state 
+    1. Location.py:this module includes method to obtain the Robot location, and establish April Tag requests
+    1.Main: all the necessary operations needed to obtain localization data from SPOT and serializing obtained data is included here.   
 
-1. Clone this repository as a starting place for development.
 
-1. Set the git remote to a new repository.
-
-1. Install a container environment and VSCode extension
-
-    <https://code.visualstudio.com/docs/remote/containers#_installation>
-
-    <https://code.visualstudio.com/docs/remote/containers-tutorial#_install-the-extension>
-
-1. Remote-Containers: Reopen in Container
-
-## Package installation process
-
-1. Install BD packages
-
-    *Note:* This step is handled by the container environment if you are using `.devcontaainer` in VSCode.
-
-    ```bash
-    python3 -m pip install --upgrade bosdyn-client bosdyn-mission bosdyn-choreography-client
-    ```
-
-1. Verify installation
-
-    ```bash
-    python3 -m pip list --format=columns | grep bosdyn
-    ```
-
-    Expected output
-
-    ```bash
-    bosdyn-api                    3.0.1
-    bosdyn-choreography-client    3.0.1
-    bosdyn-choreography-protos    3.0.1
-    bosdyn-client                 3.0.1
-    bosdyn-core                   3.0.1
-    bosdyn-mission                3.0.1
-    ```
-
-    Start Python repl
-
-    ```python:repl
-    >>> import bosdyn.client
-    >>> help(bosdyn.client)
-    ```
-
-    Expect documentation output and not an error.
-
-1. Fix versions with a requirements file
-
-    *Note:* This shouldn't be needed if you are using the `.devcontainer` as the container always uses the most recent package versions.
-
-    ```bash
-    pip3 freeze > requirements.txt
-    ```
