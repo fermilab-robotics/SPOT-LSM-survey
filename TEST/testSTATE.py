@@ -1,8 +1,6 @@
 '''
 This module is to test all the functions in Robot_state.py 
 '''
-
-
 import bosdyn.client.util
 from bosdyn.client import create_standard_sdk
 from bosdyn.client.robot_state import RobotStateClient 

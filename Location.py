@@ -15,8 +15,9 @@ class Location():
     fromOdom=[]
     fromVision=[]
     Time=[]
-    def _init_(self,robot,ToFrame="body"):
-        self.RobotState=KRobotState(robot)
+    def __init__(self,robot,ToFrame="body"):
+        self.RoboOBJ=KRobotState(robot)
+        self.robot_state=self.RoboOBJ.RobotState
         self.FromFrame=None 
         self.ToFrame=ToFrame
         self.TransformSnapshot=None
@@ -26,9 +27,10 @@ class Location():
             self.FromFrame=ODOM_FRAME_NAME
         else:
             self.FromFrame="odom"
-            self.TransformSnapshot=self.RobotState.getTransformSnapshot()
+            self.TransformSnapshot=self.RoboOBJ.getTransformSnapshot()
             odom=get_a_tform_b(self.TransformSnapshot,self.FromFrame,self.ToFrame)
-            self.fromOdom.append(odom) 
+            self.fromOdom.append(odom)
+         
     def VisionTransform(self): 
         if  self.fiducial_objects!= None:
             self.FromFrame=VISION_FRAME_NAME
@@ -37,12 +39,12 @@ class Location():
             vision=get_a_tform_b(self.TransformSnapshot,self.FromFrame,self.ToFrame)
             self.fromVision.append(vision)
     def TimeStamp(self): 
-        self.Time.append(self.RobotState.GetTimeStamp())
+        self.Time.append(self.RoboOBJ.GetTimeStamp())
         
 #robot location data 
 class RobotLocation(Location):
     def __init__(self,robot):
-       super()._init_(robot) 
+       super().__init__(robot) 
     def start(self): 
       self.OdomTransform()
       self.VisionTransform()
