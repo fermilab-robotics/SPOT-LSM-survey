@@ -22,7 +22,15 @@ def RobotLocationTest(robot):
 #test requesting Apriltag 
 def TagRequestTest(robot): 
     dummy=AprilTag(robot)
-    print(dummy.RequestFiducial())
+    #dummy.AprilOdomTransform()
+    #dummy.AprilVisionTransform()
+    #print(dummy.fromOdom)
+    #print(dummy.fromVision)
+    dummy.start()
+    print(f'{dummy.fromOdom}\n{dummy.fromVision}\n')
+
+
+
 
 
 
