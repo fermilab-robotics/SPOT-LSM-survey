@@ -12,9 +12,6 @@ from Robot_state import KRobotState
 
 #Location data with methods for tranforming from SPOT's Odom and Vision frames
 class Location():
-    fromOdom=[]
-    fromVision=[]
-    Time=[]
     def __init__(self,robot,ToFrame="body"):
         self.RoboOBJ=KRobotState(robot)
         self.robot_state=self.RoboOBJ.RobotState
@@ -22,6 +19,9 @@ class Location():
         self.ToFrame=ToFrame
         self.TransformSnapshot=None
         self.fiducial_objects=None
+        self.fromOdom=[]
+        self.fromVision=[]
+        self.Time=[]
     def OdomTransform(self): 
         if  self.fiducial_objects!= None:
             self.FromFrame=ODOM_FRAME_NAME
