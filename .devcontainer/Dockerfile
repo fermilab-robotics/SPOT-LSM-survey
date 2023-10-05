@@ -4,6 +4,10 @@
 ARG VARIANT="3.7-bullseye"
 FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
+RUN mkdir -p /home/spot-dev-environment
+
+WORKDIR /home/spot-dev-environment
+
 # [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
 ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
@@ -16,19 +20,13 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requ
 #see https://github.com/labjack/exodriver/blob/master/INSTALL.Linux
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y install --no-install-recommends libusb-1.0-0-dev  
-#clone LabJackPython 
-RUN git clone --depth=1 https://github.com/labjack/LabJackPython.git 
-#after this step, LabJackPython is located in ./ 
+
 #clone the exodriver
 RUN git clone --depth=1 --verbose https://github.com/labjack/exodriver.git 
 #after the container is build, cd into ./exodriver then run sudo ./install.sh for the exodriver to be
 #properly configured
 
-
-
-
-
-
+COPY . . 
 
 
 # [Optional] Uncomment this section to install additional OS packages.
