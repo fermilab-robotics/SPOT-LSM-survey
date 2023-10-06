@@ -22,7 +22,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && export DEBIAN_FRO
    && apt-get -y install --no-install-recommends libusb-1.0-0-dev  
 
 #clone the exodriver
-RUN git clone --depth=1 --verbose https://github.com/labjack/exodriver.git 
+RUN git clone --depth=1 --verbose https://github.com/labjack/exodriver.git \
+&& cd exodriver && ./install.sh
 #after the container is build, cd into ./exodriver then run sudo ./install.sh for the exodriver to be
 #properly configured
 
