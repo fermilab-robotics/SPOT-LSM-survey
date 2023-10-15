@@ -1,3 +1,13 @@
+---
+**NOTE** 
+I'm trying to refactor/reorganize this whole repo for a cleaner and more oranized codes. This would also allow unittest/pytest. Here are a few upcoming changes that I'm working on:  
+* the repo will no longer uses remote-dev container, changing the base image to official python image on docker-hub.
+* docker container is automated to enable usb bus share with LabJack usb device 
+* abstracts classes will be ultilized, with better comments for all components 
+* divide  all components into different folder and turn them into packages, for reusable purposes 
+* read me will be updated
+---
+
 # LSM READ WITH SPOT LOCALIZATION DATA 
 This repository includes the code to obtain the Log Survey Meter(LSM) data with defined locations taken from the  SPOT's localization test. The repository contains two main parts: 
 1. SPOT localtization test   
