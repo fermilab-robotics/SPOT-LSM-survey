@@ -2,11 +2,13 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.5/containers/python-3
 {
 	"name": "Python 3",
-	"runArgs": ["--init"],
+	"runArgs": [
+		"--init"
+	],
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": "..",
-		"args": { 
+		"args": {
 			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
 			// Append -bullseye or -buster to pin to an OS version.
 			// Use -bullseye variants on local on arm64/Apple Silicon.
@@ -15,18 +17,22 @@
 			"NODE_VERSION": "none"
 		}
 	},
-
 	"customizations": {
 		"vscode": {
 			"settings": {
 				"python.pythonPath": "/usr/local/bin/python",
 				"python.languageServer": "Pylance",
 				"python.testing.unittestEnabled": false,
-                "python.testing.pytestEnabled": true,
-				"pylint.path": ["/usr/local/py-utils/bin/pylint"],
-				"autopep8.path": ["/usr/local/py-utils/bin/autopep8"],
-				"mypy-type-checker.path":["/usr/local/py-utils/bin/mypy"]
-               
+				"python.testing.pytestEnabled": true,
+				"pylint.path": [
+					"/usr/local/py-utils/bin/pylint"
+				],
+				"autopep8.path": [
+					"/usr/local/py-utils/bin/autopep8"
+				],
+				"mypy-type-checker.path": [
+					"/usr/local/py-utils/bin/mypy"
+				]
 			},
 			"extensions": [
 				"ms-python.python",
@@ -37,15 +43,12 @@
 			],
 			"[python]": {
 				"editor.defaultFormatter": "ms-python.autopep8"
-			  }		
+			}
 		}
-	},
-
+	}
 	// Set *default* container specific settings.json values on container create.
-	
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
-
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode"
+	//"remoteUser": "vscode"
 }

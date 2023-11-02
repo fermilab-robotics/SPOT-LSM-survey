@@ -1,0 +1,11 @@
+services:
+  spot-lsm:
+    image: spot-lsm:v1.0
+    container_name: devcontainer-spot-lsm-1
+    volumes:
+      - /home/lpham/CODE/SPOT-LSM-survey:/home/spot-dev-environment
+      - /run/udev:/run/udev:ro
+      - /dev/bus/usb:/dev/bus/usb
+    privileged: true
+    entrypoint: [ "/bin/bash", "-c", "--" ]
+    command: [ "while true; do sleep 30; done;" ]
