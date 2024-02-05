@@ -19,10 +19,11 @@ def main(args):
     authenticate(robot)
     robot.sync_with_directory() 
 
-    
     spot=Spot(robot)
     xformsnapshot=spot.xformsnapshot()
     print(xformsnapshot)
+
+
 if __name__=="__main__": 
     if not main(sys.argv[1:]):
         sys.exit(1)
