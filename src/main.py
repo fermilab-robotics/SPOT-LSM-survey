@@ -12,7 +12,7 @@ from bosdyn.client.world_object import WorldObjectClient
 from bosdyn.api import world_object_pb2
 from Robot_state import KRobotState 
 from Location import * 
-from U3digitizer import *
+from src.U3digitizer import *
 import argparse
 import pickle  
 
