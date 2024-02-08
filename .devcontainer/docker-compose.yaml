@@ -1,7 +1,7 @@
 services:
   spot-lsm:
-    image: spot-lsm:v1.0
-    container_name: devcontainer-spot-lsm-1
+    image: spot-container:v1.0
+    container_name: devcontainer-spot-lsm
     volumes:
       - /home/lpham/CODE/SPOT-LSM-survey:/home/spot-dev-environment
       - /run/udev:/run/udev:ro
