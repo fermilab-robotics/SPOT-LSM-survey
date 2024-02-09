@@ -9,6 +9,7 @@ class  Mirion(Digitizer):
     """
     def __init__(self,port):
         super(Digitizer,self).__init__()
+        print('mirion initiated..')
         self.port=port
         self.d=None
     

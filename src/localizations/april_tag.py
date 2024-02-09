@@ -38,6 +38,9 @@ class AprilTag(Localization):
             body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
             return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
         
+        else: 
+            print("no tag detected. try again")
+        
     def odomxform(self):
         """
             convert between April tag kinematic VISION to BODY state
@@ -46,6 +49,8 @@ class AprilTag(Localization):
         if self.fiducial:
             body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
             return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
+        else: 
+            print("no tag detected. try again")
     
     def get_time(self):
         """

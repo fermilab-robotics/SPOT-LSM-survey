@@ -1,7 +1,8 @@
-from abc import ABCMeta, abstractclassmethod
-from collections import defaultdict
 
-class DataAcquisition(metaclass=ABCMeta):
+from collections import defaultdict
+import datetime
+
+class DataAcquisition():
     """
         To acquire localization and digitizer's data 
     """
@@ -9,24 +10,48 @@ class DataAcquisition(metaclass=ABCMeta):
         self.robot=robot
         self.tag=tag
         self.digitizer=digitizer
-        self.data=defaultdict(dict)
+        self.bot_data=defaultdict(dict)
+        self.tag_data=defaultdict(dict)
+        self.d_data=defaultdict(set)
+        self.bot_flag=False
 
-    @abstractclassmethod
-    def l_daq(self):
+
+    def bot_daq(self):
         """
-            daq for localization
+            daq for spot data
         """
-        pass
-        # time=self.localization.get_time()
-        # self.data[time]["vision"]=self.localization.visionxform()
-        # self.data[time]["odom"]=self.localization.odomxform()
+        time=self.robot.get_time()
+        self.bot_flag=True
+        vision=self.robot.visionxform()
+        odom=self.robot.odomxform()
+        self.bot_data[time]['vision']=vision
+        self.bot_data[time]['odom']=odom
+
     
-    @abstractclassmethod 
+    def tag_daq(self):
+        """
+            daq for april tag data 
+        """
+        if not self.bot_flag:
+            print("Take spot's localization first")
+        else:     
+            time=self.tag.get_time()
+            vision=self.tag.visionxform()
+            odom=self.tag.odomxform()
+            self.tag_data[time]['vision']=vision
+            self.tag_data[time]['odom']=odom
+
+
+     
+
     def d_daq(self):
         """
-            daq for digitizer
+            daq for digitizer data 
         """
-        pass
+        if self.digitizer.get_config():
+            dose=self.digitizer.start()
+            time=datetime.datetime.now()
+            self.d_daq[time]=dose
         
 
 
