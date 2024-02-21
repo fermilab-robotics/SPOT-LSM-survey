@@ -1,4 +1,18 @@
 # LSM READ WITH SPOT LOCALIZATION DATA 
+
+<p align="center"><img src="./img/spot-removebg-preview.png" width="auto" height="200" /></p>
+<p align="center"><img src="./img/FNAL-Logo-NAL-Blue.png" width="200" height="auto"></p>
+
+<div align="center" >
+<a href="https://github.com/boston-dynamics/spot-sdk"><img src="https://img.shields.io/badge/spot--sdk-FBD403?style=flat"></a>
+<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-blue?logo=docker&logoColor=white"></a>
+<a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.7-3776AB.svg?style=flat&logo=python&logoColor=white"></a>
+<a href="https://labjack.com/"><img src="https://img.shields.io/badge/LabJackPython-2.1.0-8B0000?style=flat
+"></a>
+</div>
+
+
+
 This repository includes the code to obtain the Log Survey Meter(LSM) data and SPOT locations data from the SPOT's localization test. The repository contains three main parts: 
 1. SPOT localtizations    
 2. Data stream from LabJack digitizer 
