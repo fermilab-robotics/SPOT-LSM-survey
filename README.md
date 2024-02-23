@@ -1,4 +1,8 @@
-# LSM READ WITH SPOT LOCALIZATION DATA 
+<div align="center">
+
+# SPOT-LSM-survey
+Radiation survey with digitized Log Survey Meter (LSM) and Boston Dynamic SPOT robot
+ </div>
 
 <p align="center"><img src="./img/spot-removebg-preview.png" width="auto" height="200" /></p>
 <p align="center"><img src="./img/FNAL-Logo-NAL-Blue.png" width="200" height="auto"></p>
@@ -11,26 +15,23 @@
 </div>
 
 
-
-This repository includes the code to obtain the Log Survey Meter(LSM) data and SPOT locations data from the SPOT's localization test. The repository contains three main parts: 
-1. SPOT localtizations    
-2. Data stream from LabJack digitizer 
-3. Data acquisitions 
-
 Guideline for SPOT's development environment for this repository's container setting can be found at: <https://github.com/fermilab-robotics/spot-dev-environment> 
 
 ## CONCEPTS
 
-### LOCALIZATION TEST 
-SPOT's localization test is essential in providing SPOT's definite locations in the world frame, in relative to where its dock (e.g:(0,0,0) point) is located. This data is crucial in helping us to identify the magnet from which we obtain the LSM data from.
+### LOCALIZATION 
+
+SPOT's localization data is essential in providing SPOT's definite locations in the world frame, in relative to where its dock (e.g:(0,0,0) point) is. This data is crucial in helping us identify the magnet from which we obtain the LSM radiation data from.
 
 SPOT forms its localization via a system of waypoints and edges. Waypoints define named locations in the world, and edges define how to get from one waypoint to another. SPOT Frames and April Tag are core elements that make up the fundamental of the localization test.
 
 #### SPOT Frames 
+
 SPOT's location data is acquired in Odom and Vision Frames which are the two inertial frames of the robot.
 Information about SPOT's Geometry and Frames: <https://dev.bostondynamics.com/docs/concepts/geometry_and_frames> 
 
 #### April Tag 
+
 AprilTag is a visual fiducial system. SPOT SDK includes modules(e.g:```world_object``` in the client library) that allow the implementation of AprilTag as raw data that assists with the establishing of waypoints. 
 
 SPOT is capable of detecting AprilTags using its base cameras and retrieve the data into the object frame and will be treated as the ground truth reference object. The Tag plays an essential roles in assiting SPOT navigate through the world in a metrically consistent manner. 
@@ -48,7 +49,7 @@ Exodriver is what the LabJack digitizer use to access the USB library.
 LabJackPython source code contains all the necessary modules to interact with the digitzer device for reading, writing, streaming data.
 
 ## CODE
-All source code is currently in folder [revised](./revised).
+
 ### [Localizations](./revised/localizations/)  
 Methods implemented in [localization module](./revised/localizations/localization.py) is refactored from <https://github.com/fermilab-robotics/localization_test>. 
 
@@ -61,7 +62,6 @@ Code components:
 ### [LSM Digitizer](./revised/lsm_digitizers/)
 The [digitizer module](./revised/lsm_digitizers/digitizer.py) includes methods to set up and configure the U3 DAQ device for streaming voltage readings from the LSM. 
 
-Code components:
 
 
 ### [Data Acquisitions](./revised/data_acquisitions/) 
