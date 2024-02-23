@@ -1,6 +1,8 @@
 
-from collections import defaultdict
+from collections import defaultdict,namedtuple
 import datetime
+
+Data = namedtuple('data', ['time','data'])
 
 class DataAcquisition():
     """
@@ -12,8 +14,9 @@ class DataAcquisition():
         self.digitizer=digitizer
         self.bot_data=defaultdict(dict)
         self.tag_data=defaultdict(dict)
-        self.d_data=defaultdict(set)
+        self.r_data=defaultdict(set)
         self.bot_flag=False
+        self.data_pts=0 
 
 
     def bot_daq(self):
@@ -24,8 +27,9 @@ class DataAcquisition():
         self.bot_flag=True
         vision=self.robot.visionxform()
         odom=self.robot.odomxform()
-        self.bot_data[time]['vision']=vision
-        self.bot_data[time]['odom']=odom
+        self.data_pts+=1
+        self.bot_data[self.data_pts]['vision']=Data(time,vision)
+        self.bot_data[self.data_pts]['odom']=Data(time,odom)
 
     
     def tag_daq(self):
@@ -38,8 +42,8 @@ class DataAcquisition():
             time=self.tag.get_time()
             vision=self.tag.visionxform()
             odom=self.tag.odomxform()
-            self.tag_data[time]['vision']=vision
-            self.tag_data[time]['odom']=odom
+            self.tag_data[self.data_pts]['vision']=Data(time,vision)
+            self.tag_data[self.data_pts]['odom']=Data(time,odom)
 
 
      
@@ -51,7 +55,8 @@ class DataAcquisition():
         if self.digitizer.get_config():
             dose=self.digitizer.start()
             time=datetime.datetime.now()
-            self.d_daq[time]=dose
+            self.r_data[self.data_pts]=Data(time,dose)
+
         
 
 

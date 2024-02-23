@@ -1,6 +1,8 @@
 import sys
 import argparse
+from datetime import datetime
 import time
+import pickle
 
 import bosdyn.client 
 from bosdyn.client import util,create_standard_sdk
@@ -26,7 +28,7 @@ def main(args):
     authenticate(robot)
     robot.sync_with_directory() 
 
-    #init all obj. 
+    #init all obj. import
     spot=Spot(robot)
     tag=AprilTag(robot)
     rad_detector=Mirion(port=PORT)
@@ -35,15 +37,19 @@ def main(args):
     data=DataAcquisition(spot,tag,rad_detector)
 
     while True: 
-        input("Press Enter to start..\n")
-        data.bot_daq()
-        data.tag_daq()
-        data.d_daq()
-        time.sleep()
-
-
-
-
+        try: 
+            input("Press Enter to start..\n")
+            data.bot_daq()
+            data.tag_daq()
+            data.d_daq()
+            time.sleep(30)
+        except KeyboardInterrupt:
+            rad_detector.stop()
+            file=datetime.datetime.now()
+            pickle.dump(data,open(f"data_acquisitions/{file}","wb"))
+            
+        else:
+            continue
 
 if __name__=="__main__": 
     if not main(sys.argv[1:]):
