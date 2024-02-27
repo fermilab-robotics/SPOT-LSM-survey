@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import os
 import pickle
 from csv import DictWriter
 from collections import defaultdict,namedtuple
 
 
-from data_analysis import spot_data,tag_data
+from .data_analysis import spot_data,tag_data
 
 
 
@@ -23,13 +25,14 @@ HEADERS=[
         "tag odom yaw","tag odom pitch","tag odom roll",   
     ]
 
-cur_path = os.path.dirname(__file__)
 
 def process_data(file):
+    cur_path = os.path.dirname(__file__)
     processed=[]
     daq=pickle.load(open(file,"rb"))
     data_points=daq.bot_data.keys()
-    writer=DictWriter(open(os.path.join(cur_path,f"./data/{file}.csv")))
+    csv_file=open(os.path.join(cur_path,f"./data/{file}.csv"),"w+")
+    writer=DictWriter(csv_file,fieldnames=HEADERS)
 
     for d in data_points: 
         pending_data=defaultdict(float)
@@ -46,6 +49,12 @@ def process_data(file):
         #write data 
         writer.writeheader()
         writer.writerow(pending_data)
+
+
+
+
+
+
 
 
            
