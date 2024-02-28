@@ -1,11 +1,17 @@
 services:
   spot-lsm:
-    image: spot-container:v1.0
-    container_name: devcontainer-spot-lsm
+    image: spot-lsm
+    container_name: container-spot-lsm
     volumes:
-      - /home/lpham/CODE/SPOT-LSM-survey:/home/spot-dev-environment
+      - /home/lpham/CODE/SPOT-LSM-survey:/home/SPOT-LSM-survey
       - /run/udev:/run/udev:ro
       - /dev/bus/usb:/dev/bus/usb
+    stdin_open: true
+    tty: true
     privileged: true
-    entrypoint: [ "/bin/bash", "-c", "--" ]
-    command: [ "while true; do sleep 30; done;" ]
+    #comment the line below for debugging
+    command: ["python3","main.py"]
+    #uncomment two lines below to exec into the containe for debugging
+    # entrypoint: [ "/bin/bash", "-c", "--" ]
+    # command: [ "while true; do sleep 30; done;" ]
+    
