@@ -1,4 +1,6 @@
 import sys
+import os
+import glob
 import argparse
 from datetime import datetime
 import time
@@ -8,17 +10,17 @@ import bosdyn.client
 from bosdyn.client import util,create_standard_sdk
 from bosdyn.client.util import authenticate
 
-from localizations.spot import Spot
-from localizations.april_tag import AprilTag
-from digitizers.acr import Mirion
-from digitizers.labjack import LabJack
-from data_acquisitions.data_acquisition import DataAcquisition
-from data_acquisitions.data_export import HEADERS,process_data
+from .localizations.spot import Spot
+from .localizations.april_tag import AprilTag
+from .digitizers.acr import Mirion
+from .digitizers.labjack import LabJack
+from .data_acquisitions.data_acquisition import DataAcquisition
+from .data_acquisitions.data_export import HEADERS,process_data
 
 PORT='core-port'
 robot_action="1.daq: walk the robot without exporting the data to csv after \n \
-              2.exportData: only for exporting to csv data \n  3. walk the robot then export it to csv"
-check_val=lambda w: w if w in ["Y","N","y","n"] else raise_(ValueError("wrong value"))
+              2.exportData: only for processing obtained raw to csv data \n  3. walk the robot then export data to csv"
+check_val=lambda w: w if w in ["Y","N","y","n"] else raise_(ValueError())
 
 def raise_(exception):
     raise exception
@@ -49,12 +51,13 @@ def main(args):
     data=DataAcquisition(spot,tag,rad_detector)
 
     #if action not specified, proceed with both walking the robot and export data 
-    if options.action!=2:
+    if not options.action or options.action!="2" :
         while True: 
             input("Press Enter when SPOT is ready..\n")
             data.bot_daq()
             data.tag_daq()
             data.d_daq()
+            
             while True: 
                 try:
                     walking=input ("Walking to the next tag? Y/N \n")
@@ -62,34 +65,57 @@ def main(args):
 
                 except ValueError():
                     print("please only pick Y or N")
+
             if walking=="Y" or walking=="y":
+                time.sleep(20)
                 continue
             else: 
                 rad_detector.stop()
                 file=datetime.datetime.now()
-                pickle.dump(data,open(f"data_acquisitions/{file}","wb+"))
-                # if user want data exported to csv 
-                if options.action==1: 
-                    process_data(file)
+                pickle.dump(data,open(f"data_acquisitions/data/{file}.pickle","wb+"))
+                # if user wants data exported to csv 
+                if options.action==3: 
+                    process_data(f'{file}.pickle')
                     print("data exported at data/{file}.csv")
                 
                 print("exiting..")
+                break
     
     else: 
         #if user only wants to process collected data 
-        pass 
+        path=os.path.join(os.path.dirname(__file__),"data_acquisitions/data/")
+        all_files=os.listdir(path)
+        unprocessed_files=list(filter(lambda f:f.endswith(".pickle"),all_files))
+        
+        #prompt user to choose file to be processed
+        user_options= None
+        while user_options not in ["1","2"]:
+            user_options=input("1.Proceed with the latest file in the folder \n2. List all files\n")
 
-
-
-               
+        #latest file option 
+        if user_options=="1": 
+            latest_file = max([(file, os.path.getctime(path+file)) \
+                               for file in unprocessed_files],key=lambda x:x[-1])[0]
+            process_data(latest_file)
+        
+        #list all files option
+        else: 
+            for file_number,file in enumerate(unprocessed_files): 
+                print(f"option {file_number} : {file}")
             
+            file_input=None
+            while file_input not in list(range(len(unprocessed_files))):
+                file_input= input("Choose a file number?\n")
+                file_input=int(file_input)
             
-           
+            process_data(unprocessed_files[file_input])
 
-    
+
+
 
 if __name__=="__main__": 
-    main(sys.argv[1:])
+    if not main(sys.argv[1:]):
+        sys.exit(1)
     
 
 

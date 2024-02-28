@@ -31,6 +31,7 @@ def process_data(file):
     processed=[]
     daq=pickle.load(open(file,"rb"))
     data_points=daq.bot_data.keys()
+    file=file.split('.')[0] #remove pickle out of file name
     csv_file=open(os.path.join(cur_path,f"./data/{file}.csv"),"w+")
     writer=DictWriter(csv_file,fieldnames=HEADERS)
 
