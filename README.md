@@ -15,96 +15,168 @@ Radiation survey with digitized Log Survey Meter (LSM) and Boston Dynamic SPOT r
 </div>
 
 
-Guideline for SPOT's development environment for this repository's container setting can be found at: <https://github.com/fermilab-robotics/spot-dev-environment> 
-
 ## CONCEPTS
 
-### LOCALIZATION 
+## 💎 LOCALIZATION 
 
-SPOT's localization data is essential in providing SPOT's definite locations in the world frame, in relative to where its dock (e.g:(0,0,0) point) is. This data is crucial in helping us identify the magnet from which we obtain the LSM radiation data from.
+SPOT's localization data is essential in providing SPOT's definite locations in the world frame, in relative to where its dock (e.g:(0,0,0) point) is. This data is crucial in helping us identify the location from which we obtain the LSM radiation data from.
 
-SPOT forms its localization via a system of waypoints and edges. Waypoints define named locations in the world, and edges define how to get from one waypoint to another. SPOT Frames and April Tag are core elements that make up the fundamental of the localization test.
+SPOT forms its localization via a system of waypoints and edges. Waypoints define named locations in the world, and edges define how to get from one waypoint to another. SPOT Frames and April Tag are fundamental of the localization data. 
 
-#### SPOT Frames 
+### 🥇 SPOT FRAMES 
 
-SPOT's location data is acquired in Odom and Vision Frames which are the two inertial frames of the robot.
+SPOT's location data is acquired in Odom and Vision Frames. 
 Information about SPOT's Geometry and Frames: <https://dev.bostondynamics.com/docs/concepts/geometry_and_frames> 
 
-#### April Tag 
+### 🥈 APRIL TAG
 
-AprilTag is a visual fiducial system. SPOT SDK includes modules(e.g:```world_object``` in the client library) that allow the implementation of AprilTag as raw data that assists with the establishing of waypoints. 
+AprilTag is our choice of visual fiducial system for this project. The SPOT SDK includes modules(e.g:```world_object``` in the client library) that enable the implementation of AprilTag to assist SPOT with the establishing of waypoints. 
 
-SPOT is capable of detecting AprilTags using its base cameras and retrieve the data into the object frame and will be treated as the ground truth reference object. The Tag plays an essential roles in assiting SPOT navigate through the world in a metrically consistent manner. 
+SPOT detects AprilTags using its base cameras and retrieve the data into the object frame which then will be treated as the ground truth reference object. The Tag plays an essential roles in assiting SPOT navigate through the world in a metrically consistent manner. 
 
-In our case, April Tag assists us with our calibration purposes for localizing SPOT in the world, on top of SPOT's frame system itself. 
+In this project, April Tag assists us with our calibration purposes for localizing SPOT in the world, on top of SPOT's frame system itself. 
 
-### LABJACK DIGITIGER READING 
-The main duty of the LabJack digitizer is to take the actual radiation dose readings from the LSM and digitize them into bits that we could further process for our interests. 
-LabJack has their own repositories [Exodriver](https://github.com/labjack/exodriver) and [LabJackPython](https://github.com/labjack/LabJackPython). These two libraries are already set up in the Docker container.
+## 💎 LSM DIGITIZERS
 
-#### Exodriver 
-Exodriver is what the LabJack digitizer use to access the USB library. 
+LSM Digitizers are used to digitize radiation dose readings. There are two options: 
+- [LabJack](https://labjack.com/)
+- [Mirion](https://www.mirion.com)
 
-#### LabJackPython
-LabJackPython source code contains all the necessary modules to interact with the digitzer device for reading, writing, streaming data.
+All modules and dependencies needed for digitizers have been configured in the Docker Container, see usage below for more info. 
 
-## CODE
+### 📚 LABJACK  
 
-### [Localizations](./revised/localizations/)  
-Methods implemented in [localization module](./revised/localizations/localization.py) is refactored from <https://github.com/fermilab-robotics/localization_test>. 
+Module Requirements: 
+- [Exodriver](https://github.com/labjack/exodriver)
+- [LabJackPython](https://github.com/labjack/LabJackPython)
 
-Code components: 
-1. `xformsnapshot`: method to get transform snapshot
-2. `visionxform`: method to obtain body frame from vision frame
-3. `odomxform`: method to obtain body frame from odom frame
-4. `get_time`: method to get time stamp
+### 📔 MIRION 
 
-### [LSM Digitizer](./revised/lsm_digitizers/)
-The [digitizer module](./revised/lsm_digitizers/digitizer.py) includes methods to set up and configure the U3 DAQ device for streaming voltage readings from the LSM. 
+Module Requirements: 
+- [accurad](https://github.com/fermilab-robotics/AccuRad-PRD)
+
+The `accurad` module is written by members of Fermilab's Robotic Initiative 
 
 
+## INSTALLATION 
 
-### [Data Acquisitions](./revised/data_acquisitions/) 
+## 📝 REQUIREMENTS 
 
-The [data_acquisition module](./revised/data_acquisitions/data_acquisition.py) includes methods to process data for data report. 
+- Docker 
+- Docker Compose >=1.10.0
+- SPOT API credentials
 
-Code componenets:
+## 🚧 BUILD DOCKER IMAGE
+1. Clone the repository 
+
+```bash
+    git clone https://github.com/fermilab-robotics/SPOT-LSM-survey.git
+```
+
+2. Build the Docker image 
+
+```bash 
+    cd SPOT-LSM-survey/
+    docker build -f .devcontainer/Dockerfile -t spot-lsm . 
+```
+
+
+## USAGE 
+
+
+First, change the directory to where `docker-compose.yaml` is located. 
+
+```bash 
+    cd SPOT-LSM-survey/.devcontainer/
+```
+
+Run the container 
+
+```bash 
+    docker compose run --rm spot-lsm <your-user-name> spot.fnal.gov \
+    -a <action-option> -r <radDigitizer-option> 
+    
+```
+
+- `<your-user-name` : your username for the SPOT API.
+- `-a`: optional flag to specify action options that you want to perform on SPOT, more details below. 
+- `-r`: optional flag to specify the LSM digitizer that you take rad dose from, default is Mirion.  
+
+All obtained data is located in `src/data_acquisitions/data`
+
+### ⚓ ACTION OPTIONS 
+
+There are three action options that could be passed to the `-a` flag: 
+- `1` : Enter mode to take localization data, data is stored to be processed later
+    - After SPOT finishes taking data at each location, there will be prompt questions asking if SPOT is walking to the next location, if YES, the process continues, if NO the program exits.
+
+- `2` : Enter mode to process previously collected data. There are two options for this mode, question will be prompted on the screen for you to pick your option: 
+    - Option `1` : process with the lastest data file obtained
+    - Option `2` : list all raw data files, you pick the file you want to process
+    
+    
+- `3` : Enter mode to take localization data, then export data to csv file after SPOT finishes the walk.  
+    - This is the default option if nothing is specified.
+    - This mode proceeds to take localization data, then export the data to a CSV file right after.   
+
+
+### ⛵ DIGITIZER OPTIONS
+
+- `Mirion`
+- `LabJack`
+
+### 📔 EXAMPLE 
+
+Let's take SPOT's localization data when it walks with the Mirion digitizer, then export data to a CSV format file right after (i.e: default option). Your SPOT's username is `myusername`
+
+```bash 
+    docker compose run --rm spot-lsm myusername spot.fnal.gov
+```
+
+How about just taking SPOT localization data, with the LabJack digitizer? 
+
+```bash
+    docker compose run --rm spot-lsm myusername spot.fnal.gov / 
+    -a 1 -r LabJack 
+```
+
 
 ## DEVELOPMENT ENVIRONMENT SETUP
-There are two options to set up the development environment: 
-- [Vscode remote dev container](https://code.visualstudio.com/docs/devcontainers/containers)
-- [Docker compose](https://docs.docker.com/compose/)
 
-For testing out reading from U3 DAQ device, docker compose has to be used. 
+If you're intested in modifying the code to test out on SPOT. There are two options to set up the development environment: 
+- [Vscode Remote Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-### Remote Dev Container
+
+### :rainbow: REMOTE DEV CONTAINER 
+
+Guideline for SPOT's development environment for this repository's container setting can be found at: <https://github.com/fermilab-robotics/spot-dev-environment> 
 
 1. Install [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 1. From the `command pallete` of vscode, select `Reopen in container`
 The image will be built using the Dockerfile in the .devcontainer folder. [devcontainer.json](.devcontainer/devcontainer.json) is referenced to build up the container. 
 
 
+### :ocean: DOCKER COMPOSE 
 
-### Docker Compose 
-
-1. Build the based image
-
-```
-cd /path_to_your_cloned_repository
-
-docker build -f .devcontainer/Dockerfile -t spot-lsm:v1.0 
-```
-
-2. Modify volume mount directory in docker-compose.yaml
+1. Modify volume mount directory in docker-compose.yaml
 
 Volume mount is being used for the container so that changes in local repository would be reflected inside the container. 
 The very first line of volume mount, currently `/home/lpham/CODE/SPOT-LSM-survey` needed to be changed to an absolute path to where your local cloned repository is located. 
 
-3. Spin up the container 
+2. Modify the command line in docker-compose.yaml 
 
+- Comment out `command: ["python3","main.py"]`
+- Uncomment the last 2 lines. This will ensure that the container will stay up for you to test your code with the current container configurations.
+
+3. Exec into the container
+
+```bash
+    cd SPOT-LSM-survey/.devcontainer
+    docker compose up -d 
+    docker compose exec -it container-spot-lsm /bin/bash
 ```
-docker compose up -d 
-```
+
 
 
 
