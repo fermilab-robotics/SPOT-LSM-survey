@@ -1,3 +1,5 @@
+from time import ctime
+
 from bosdyn.api import robot_state_pb2, robot_state_service_pb2_grpc
 from bosdyn.client.robot_state import RobotStateClient
 from bosdyn.client.frame_helpers import get_a_tform_b
@@ -46,7 +48,7 @@ class Spot(Localization):
         """
             get timestamps
         """
-        return self._robot_state.kinematic_state.acquisition_timestamp
+        return ctime(self._robot_state.kinematic_state.acquisition_timestamp.seconds)
 
     
 

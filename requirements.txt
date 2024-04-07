@@ -1,6 +1,7 @@
-bosdyn-client
-bosdyn-mission
-bosdyn-choreography-client
+bosdyn-client==3.3.2
+bosdyn-mission==3.3.2
+bosdyn-choreography-client==3.3.2
+certifi==2023.7.22
 git+https://github.com/labjack/LabJackPython.git@master
 git+https://github.com/fermilab-robotics/AccuRad-PRD.git@main
 

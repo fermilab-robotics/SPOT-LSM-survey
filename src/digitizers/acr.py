@@ -40,7 +40,7 @@ class  Mirion(Digitizer):
         """
             close port
         """
-        self.port.close()
+        pass
 
 
 

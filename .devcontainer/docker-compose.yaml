@@ -1,17 +1,23 @@
 services:
   spot-lsm:
-    image: spot-lsm
+    image: spot-lsm:v2.0
     container_name: container-spot-lsm
     volumes:
       - /home/lpham/CODE/SPOT-LSM-survey:/home/SPOT-LSM-survey
+      #mounting usb bus for the digitizer
       - /run/udev:/run/udev:ro
       - /dev/bus/usb:/dev/bus/usb
-    stdin_open: true
-    tty: true
+      - /dev/ttyACM0:/dev/ttyACM0
+    env_file:
+      - .env
+    # ports:
+    #   - "443:443"
+    # stdin_open: true
+    # tty: true
     privileged: true
     #comment the line below for debugging
-    command: ["python3","main.py"]
+    # command: ["src/test.py","${spot_host}"]
     #uncomment two lines below to exec into the containe for debugging
-    # entrypoint: [ "/bin/bash", "-c", "--" ]
-    # command: [ "while true; do sleep 30; done;" ]
+    entrypoint: [ "/bin/bash", "-c", "--" ]
+    command: [ "while true; do sleep 30; done;" ]
     

@@ -56,7 +56,8 @@ class AprilTag(Localization):
         """
             get tag time 
         """
-        return datetime.datetime.now()
+        now= datetime.datetime.now()
+        return now.strftime("%m/%d/%Y, %H:%M:%S")
 
 
 

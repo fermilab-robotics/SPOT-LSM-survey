@@ -1,21 +1,23 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 import glob
 import argparse
 from datetime import datetime
 import time
-import pickle
+import json
 
 import bosdyn.client 
 from bosdyn.client import util,create_standard_sdk
 from bosdyn.client.util import authenticate
 
-from .localizations.spot import Spot
-from .localizations.april_tag import AprilTag
-from .digitizers.acr import Mirion
-from .digitizers.labjack import LabJack
-from .data_acquisitions.data_acquisition import DataAcquisition
-from .data_acquisitions.data_export import HEADERS,process_data
+from localizations.spot import Spot
+from localizations.april_tag import AprilTag
+from digitizers.acr import Mirion
+# from digitizers.labjack import LabJack
+from data_acquisitions.data_acquisition import DataAcquisition
+from data_acquisitions.data_export import HEADERS,process_data
 
 PORT='core-port'
 robot_action="1.daq: walk the robot without exporting the data to csv after \n \
@@ -45,18 +47,18 @@ def main(args):
     #init all obj. import
     spot=Spot(robot)
     tag=AprilTag(robot)
-    if not options.radMeter or options.radMeter=="Mirion": rad_detector=Mirion(port=PORT)
-    if options.radMeter=="LabJack": rad_detector=LabJack() 
-    #daq obj 
-    data=DataAcquisition(spot,tag,rad_detector)
+    if not options.radMeter or options.radMeter=="Mirion": rad_detector=Mirion(port="/dev/ttyACM0")
+    # if options.radMeter=="LabJack": rad_detector=LabJack() 
+    # #daq obj 
+    d=DataAcquisition(spot,tag,rad_detector)
 
-    #if action not specified, proceed with both walking the robot and export data 
+    # #if action not specified, proceed with both walking the robot and export data 
     if not options.action or options.action!="2" :
         while True: 
             input("Press Enter when SPOT is ready..\n")
-            data.bot_daq()
-            data.tag_daq()
-            data.d_daq()
+            d.bot_daq()
+            d.tag_daq()
+            d.d_daq()
             
             while True: 
                 try:
@@ -67,25 +69,29 @@ def main(args):
                     print("please only pick Y or N")
 
             if walking=="Y" or walking=="y":
-                time.sleep(20)
+                time.sleep(1)
                 continue
             else: 
                 rad_detector.stop()
-                file=datetime.datetime.now()
-                pickle.dump(data,open(f"data_acquisitions/data/{file}.pickle","wb+"))
-                # if user wants data exported to csv 
-                if options.action==3: 
-                    process_data(f'{file}.pickle')
-                    print("data exported at data/{file}.csv")
-                
+                # file=datetime.now()
+                file="test2"
+                with open(f"data_acquisitions/data/{file}.json", 'w+') as f:
+                    json.dump(d.data,f,default=lambda o: o.__dict__,indent=4)
+                   
+                # if user wants data exported to csv after walking the robot
+                if options.action=="3": 
+                    process_data(f'{file}.json')
+                   
                 print("exiting..")
                 break
     
     else: 
+        print("Entering option to only process data")
         #if user only wants to process collected data 
         path=os.path.join(os.path.dirname(__file__),"data_acquisitions/data/")
         all_files=os.listdir(path)
-        unprocessed_files=list(filter(lambda f:f.endswith(".pickle"),all_files))
+        unprocessed_files=list(filter(lambda f:f.endswith(".json"),all_files))
+        print(unprocessed_files)
         
         #prompt user to choose file to be processed
         user_options= None
