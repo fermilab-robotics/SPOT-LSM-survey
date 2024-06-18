@@ -1,4 +1,5 @@
 spot/
 .python-version
 *.pyc
+data/
 .env

@@ -1,18 +1,16 @@
 FROM ubuntu:20.04
 
 WORKDIR /home/SPOT-LSM-survey
-#Our current spot is only compatible with python3.7
+ENV TZ="America/Chicago"
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y pip python3.8-venv \
-   && apt-get clean 
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+   python3.9-venv  && apt-get clean 
 
-RUN python3.8 -m venv /venv
+RUN python3.9 -m venv /venv
 ENV PATH=/venv/bin:$PATH
 
-
-# pip install
 COPY requirements.txt /tmp/pip-tmp/
-RUN apt-get install -y git
+RUN apt-get install -y git udev
 RUN pip --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
    && rm -rf /tmp/pip-tmp
 
@@ -26,16 +24,14 @@ RUN pip --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
 #    && cd exodriver && ./install.sh
 
 COPY . . 
+RUN chmod +x port_detection.sh entrypoint.sh
+
+ENTRYPOINT ["bash","-c","source ./entrypoint.sh"]
 
 
 
-# WORKDIR /home/SPOT-LSM-survey/src/data_acquisitions/
-# RUN cp data_export.py tocsv && chmod +x tocsv && cp tocsv /usr/sbin
 
-# WORKDIR /home/SPOT-LSM-survey
-ENTRYPOINT ["python3"]
-
-
+  
 
 
 
