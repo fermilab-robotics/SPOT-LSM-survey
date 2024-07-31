@@ -90,15 +90,18 @@ First, change the directory to where `docker-compose.yaml` is located.
     cd SPOT-LSM-survey/.devcontainer/
 ```
 
+Set up your .env file: 
+- `.env` file contains all credentials needed to communicate with SPOT 
+- See .devcontainer/.env.example for more information. 
+
 Run the container 
 
 ```bash 
-    docker compose run --rm spot-lsm <your-user-name> spot.fnal.gov \
+    docker compose run --rm spot-lsm \
     -a <action-option> -r <radDigitizer-option> 
     
 ```
 
-- `<your-user-name` : your username for the SPOT API.
 - `-a`: optional flag to specify action options that you want to perform on SPOT, more details below. 
 - `-r`: optional flag to specify the LSM digitizer that you take rad dose from, default is Mirion.  
 
@@ -127,10 +130,10 @@ There are three action options that could be passed to the `-a` flag:
 
 ### 📔 EXAMPLE 
 
-Let's take SPOT's localization data when it walks with the Mirion digitizer, then export data to a CSV format file right after (i.e: default option). Your SPOT's username is `myusername`
+Let's take SPOT's localization data when it walks with the Mirion digitizer, then export data to a CSV format file right after (i.e: default option).
 
 ```bash 
-    docker compose run --rm spot-lsm myusername spot.fnal.gov
+    docker compose run --rm spot-lsm
 ```
 
 How about just taking SPOT localization data, with the LabJack digitizer? 

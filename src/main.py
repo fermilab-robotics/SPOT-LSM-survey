@@ -2,9 +2,7 @@
 
 import sys
 import os
-import glob
 import argparse
-from datetime import datetime
 import time
 import json
 
@@ -19,13 +17,10 @@ from digitizers.acr import Mirion
 from data_acquisitions.data_acquisition import DataAcquisition
 from data_acquisitions.data_export import HEADERS,process_data
 
-PORT='core-port'
 robot_action="1.daq: walk the robot without exporting the data to csv after \n \
               2.exportData: only for processing obtained raw to csv data \n  3. walk the robot then export data to csv"
-check_val=lambda w: w if w in ["Y","N","y","n"] else raise_(ValueError())
+is_walking=lambda w: w if w in ["Y","N","y","n"] else False
 
-def raise_(exception):
-    raise exception
 
 
 def main(args):
@@ -33,16 +28,16 @@ def main(args):
     # args 
     parser=argparse.ArgumentParser()
     bosdyn.client.util.add_base_arguments(parser)
-    parser.add_argument('-r','--radMeter',help="choice of rad detector",choices=['mirion','LabJack'])
+    parser.add_argument('-r','--radMeter',default='Mirion',nargs='?',help="choice of rad detector",choices=['Mirion','LabJack'])
     parser.add_argument("-a","--action",help=robot_action,choices=["1","2","3"])
     options=parser.parse_args(args)
+    print(options)
 
     #create robot obj.  & authenticate 
     sdk=create_standard_sdk('test')
     robot=sdk.create_robot(options.hostname)
     authenticate(robot)
-    robot.sync_with_directory() 
-
+    robot.sync_with_directory()    
 
     #init all obj. import
     spot=Spot(robot)
@@ -60,26 +55,24 @@ def main(args):
             d.tag_daq()
             d.d_daq()
             
-            while True: 
-                try:
-                    walking=input ("Walking to the next tag? Y/N \n")
-                    if check_val(walking): break 
 
-                except ValueError():
-                    print("please only pick Y or N")
+            walking=input ("Walking to the next tag? Y/N \n")
+            if not is_walking(walking) or is_walking(walking) in ['N','n']: 
+                break 
 
-            if walking=="Y" or walking=="y":
+            elif walking=="Y" or walking=="y":
                 time.sleep(1)
                 continue
+
             else: 
                 rad_detector.stop()
-                # file=datetime.now()
-                file="test2"
-                with open(f"data_acquisitions/data/{file}.json", 'w+') as f:
+                file=input("name file? \n")
+                file_path = os.path.dirname(__file__)
+                with open(os.path.join(file_path,f"data_acquisitions/data/{file}.json"),"w+") as f: 
                     json.dump(d.data,f,default=lambda o: o.__dict__,indent=4)
                    
                 # if user wants data exported to csv after walking the robot
-                if options.action=="3": 
+                if options.action!="1": 
                     process_data(f'{file}.json')
                    
                 print("exiting..")
@@ -91,7 +84,6 @@ def main(args):
         path=os.path.join(os.path.dirname(__file__),"data_acquisitions/data/")
         all_files=os.listdir(path)
         unprocessed_files=list(filter(lambda f:f.endswith(".json"),all_files))
-        print(unprocessed_files)
         
         #prompt user to choose file to be processed
         user_options= None

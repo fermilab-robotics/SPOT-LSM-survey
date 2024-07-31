@@ -1,4 +1,4 @@
-import datetime
+from time import ctime
 
 from bosdyn.api import world_object_pb2
 from bosdyn.client.world_object import WorldObjectClient 
@@ -25,8 +25,12 @@ class AprilTag(Localization):
         """
             transform snapshots to convert between April Tag's kinematic states
         """
-        if self.fiducial: 
-            return self.fiducial.transforms_snapshot
+        snapshot=[]
+        if not self.fiducial: 
+            print('No tag found')
+        for f in self.fiducial: 
+            snapshot.append(f.transforms_snapshot)
+        return snapshot 
         
     def visionxform(self):
         """ 
@@ -34,30 +38,50 @@ class AprilTag(Localization):
     
         """
         key_frame=VISION_FRAME_NAME
-        if self.fiducial:
-            body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
-            return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
-        
-        else: 
+        vision=[]
+        if not self.fiducial: 
             print("no tag detected. try again")
+        else: 
+
+            for xform,f in zip(self.xformsnapshot(),self.fiducial):
+                tag_vision=get_a_tform_b(xform,key_frame,f.apriltag_properties.frame_name_fiducial)
+                vision.append(tag_vision)
+            return vision 
+
+        # if self.fiducial:
+        #     body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
+        #     return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
+        
+        
         
     def odomxform(self):
         """
             convert between April tag kinematic VISION to BODY state
         """
         key_frame=ODOM_FRAME_NAME
-        if self.fiducial:
-            body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
-            return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
-        else: 
+        odom=[]
+        if not self.fiducial: 
             print("no tag detected. try again")
+        else: 
+
+            for xform,f in zip(self.xformsnapshot(),self.fiducial):
+                tag_odom=get_a_tform_b(xform,key_frame,f.apriltag_properties.frame_name_fiducial)
+                odom.append(tag_odom)
+            return odom
+
+
+        # if self.fiducial:
+        #     body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
+        #     return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
+        # else: 
+        #     print("no tag detected. try again")
     
     def get_time(self):
         """
             get tag time 
         """
-        now= datetime.datetime.now()
-        return now.strftime("%m/%d/%Y, %H:%M:%S")
+        time=self.fiducial[0].acquisition_time.seconds
+        return ctime(time)
 
 
 

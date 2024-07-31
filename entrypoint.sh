@@ -8,6 +8,6 @@ if [ -f /etc/profile.d/mirion_port.sh ]; then
 fi
 
 
-python3 test_container.py 
+python3 main.py $spot_host 
 
 exec "$@"

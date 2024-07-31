@@ -13,8 +13,6 @@ for sysdevpath in $(find /sys/bus/usb/devices/usb*/ -name dev); do
     [[ -z "$ID_SERIAL" ]] && continue
     if [[ $ID_SERIAL =~ "Mirion" ]]; then
         port="/dev/$devname"
-        # echo $port
-        #sudo chmod 666 "$port"
         echo "export mirion_port=$port" > /etc/profile.d/mirion_port.sh
         mirion_port=$port  
         if [[ -n "$mirion_port" ]]; then break; fi

@@ -6,7 +6,7 @@ from csv import DictWriter
 from collections import defaultdict
 
 
-from .data_analysis import spot_data,tag_data
+# from .data_analysis import spot_data,tag_data
 
 
 
@@ -22,7 +22,7 @@ HEADERS=[
     ]
 
 
-def process_data(file):
+def process_dat(file):
     cur_path = os.path.dirname(__file__)
     with open(os.path.join(cur_path,f"./data/{file}"),"rb") as f: 
         daq=json.load(f)
@@ -56,12 +56,25 @@ def process_data(file):
     
     print(f"data exported at data/{file}.csv")
 
+tag_names=[]
+
+def process_data(file):
+
+    #load json 
+    cur_path = os.path.dirname(__file__)
+    with open(os.path.join(cur_path,f"./data/{file}"),"rb") as f: 
+        data_pts=json.load(f)
+        for data in data_pts:
+            time,v=data_pts[data]['tag'].items()
+            
+    
+
 
 
 
 #debugging only
 if __name__=="__main__":
-    process_data("test.json")
+    process_data("lll.json")
 
 
            
