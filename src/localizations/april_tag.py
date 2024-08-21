@@ -48,9 +48,7 @@ class AprilTag(Localization):
                 vision.append(tag_vision)
             return vision 
 
-        # if self.fiducial:
-        #     body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
-        #     return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
+      
         
         
         
@@ -70,11 +68,7 @@ class AprilTag(Localization):
             return odom
 
 
-        # if self.fiducial:
-        #     body_frame=self.fiducial.apriltag_properties.frame_name_fiducial
-        #     return get_a_tform_b(self.xformsnapshot(),key_frame,body_frame)
-        # else: 
-        #     print("no tag detected. try again")
+ 
     
     def get_time(self):
         """

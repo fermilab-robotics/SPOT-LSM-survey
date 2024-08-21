@@ -10,7 +10,7 @@ from bosdyn.client.data_acquisition_plugin_service import (Capability, DataAcqui
 from bosdyn.client.data_acquisition_store import DataAcquisitionStoreClient
 from bosdyn.client.directory_registration import (DirectoryRegistrationClient,
                                                   DirectoryRegistrationKeepAlive)
-from bosdyn.client.math_helpers import SE3Pose
+
 
 from bosdyn.client.robot_state import RobotStateClient
 from bosdyn.client.server_util import GrpcServiceRunner
@@ -22,11 +22,12 @@ from data_acquisition import quat_to_Euler
 sys.path.append("/home/lpham/CODE/SPOT-LSM-survey/src/")
 from localizations.spot import Spot
 
+from spot_daq import spot_data
 
 
 DIRECTORY_NAME = 'spot-lsm-data-acquisition'
 AUTHORITY = 'spot-mirion'
-CAPABILITY = Capability(name='spot-lsm', description='radiation measurement', channel_name='spot')
+CAPABILITY = Capability(name='spot-lsm', description='radiation measurement', channel_name='spot-lsm')
 
 
 _LOGGER = logging.getLogger('spot-lsm')
@@ -36,7 +37,6 @@ class SpotLsm:
 
     def __init__(self, sdk_robot):
         self.client = sdk_robot.ensure_client(RobotStateClient.default_service_name)
-        self.spot=Spot(sdk_robot)
 
     def get_spot_data(self, request: data_acquisition_pb2.AcquirePluginDataRequest,
                          store_helper: DataAcquisitionStoreHelper):
@@ -50,38 +50,28 @@ class SpotLsm:
 
         message = data_acquisition_pb2.AssociatedMetadata()
         message.reference_id.action_id.CopyFrom(request.action_id)
-
-        message.metadata.data.update(
-            {
-                "vision": json_format.MessageToJson(self.spot.visionxform().to_proto())
-            
-            }
-        )
-
-        #example for another field of data
-        data_id2= data_acquisition_pb2.DataIdentifier(action_id=request.action_id,data_name="test_data",
-                                                      channel='test')
         
-        message2 = data_acquisition_pb2.AssociatedMetadata()
-        message2.reference_id.action_id.CopyFrom(request.action_id)
-        message.metadata.data.update(
-            {
-                "percentage": state.power_state.locomotion_charge_percentage.value 
-            
-            }
-        )
 
+
+        # message.metadata.data.update(
+        #     {
+        #         "vision": json_format.MessageToJson(self.spot.visionxform().to_proto())
+            
+        #     }
+        # )
+        
+       
       
         _LOGGER.info('Retrieving battery data: %s', message.metadata.data)
 
         store_helper.store_metadata(message, data_id)
-        store_helper.store_metadata(message2, data_id2)
-
+      
     
 def make_servicer(sdk_robot):
     """Create the data acquisition servicer """
     
     adapter = SpotLsm(sdk_robot)
+    spot_data(sdk_robot)
     return DataAcquisitionPluginService(sdk_robot, [CAPABILITY], adapter.get_spot_data,logger=_LOGGER)
 
 
@@ -110,7 +100,8 @@ def main():
 
     sdk = bosdyn.client.create_standard_sdk('BatteryPlugin')
     robot = sdk.create_robot(options.hostname)
-    bosdyn.client.util.authenticate(robot)
+    # bosdyn.client.util.authenticate(robot)
+    robot.authenticate_from_payload_credentials(*bosdyn.client.util.get_guid_and_secret(options))
 
     service_runner = run_service(robot, options.port)
 

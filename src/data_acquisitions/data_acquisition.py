@@ -50,13 +50,13 @@ class DataAcquisition():
         # odom=self.robot.odomxform()
         self.data_pts+=1
         self.bot_data[time]={}
-        self.bot_data[time].update({'vision':vision})
+        self.bot_data[time].update({'vision':vision.get_translation()})
         bot_euler_angle=quat_to_Euler(vision)
         self.bot_data[time].update({'yaw':bot_euler_angle.yaw})
         self.bot_data[time].update({'pitch':bot_euler_angle.pitch})
         self.bot_data[time].update({'roll':bot_euler_angle.roll})
         # self.bot_data[time].update({'odom':odom})
-        self.data[self.data_pts]['spot']={time:self.bot_data[time]}
+        self.data['spot']={time:self.bot_data[time]}
     
     def tag_daq(self):
         """
@@ -65,16 +65,18 @@ class DataAcquisition():
         if not self.bot_flag:
             print("Take spot's localization first")
         else:     
-            time=self.tag.get_time()
+            
             vision=self.tag.visionxform()
+            time=self.tag.get_time()
             # odom=self.tag.odomxform()
             self.tag_data[time]={}
+            
             
             for idx,f in enumerate(self.tag.fiducial): 
             
                 
                 self.tag_data[time].update({f.name:{}})
-                self.tag_data[time][f.name].update({'vision':vision[idx]})
+                self.tag_data[time][f.name].update({'vision':vision[idx].get_translation()})
                 tag_euler_angle=quat_to_Euler(vision[idx])
                 self.tag_data[time][f.name].update({'yaw':tag_euler_angle.yaw})
                 self.tag_data[time][f.name].update({'picth':tag_euler_angle.pitch})
@@ -87,7 +89,7 @@ class DataAcquisition():
             # self.tag_data[time].update({'pitch':tag_euler_angle.pitch})
             # self.tag_data[time].update({'roll':tag_euler_angle.roll})
             # self.tag_data[time].update({'odom':odom})
-            self.data[self.data_pts]['tag']={time:self.tag_data[time]}
+            self.data['tag']={time:self.tag_data[time]}
 
      
 
@@ -106,7 +108,7 @@ class DataAcquisition():
           
             self.r_data[time].update({"mrem":dose[2]})
             self.r_data[time].update({"duration":dose[3]})
-            self.data[self.data_pts]['mirion']={time:self.r_data[time]}
+            self.data['mirion']={time:self.r_data[time]}
             
 
         
