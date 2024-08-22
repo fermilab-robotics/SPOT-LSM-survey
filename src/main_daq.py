@@ -12,8 +12,10 @@ from localizations.april_tag import AprilTag
 from digitizers.acr import Mirion
 from data_acquisitions.data_acquisition import DataAcquisition
 
-
-
+path=os.path.dirname(__file__)
+path_to_file=os.path.join(path,"../src/data_acquisitions/data/official_data.csv")
+path_to_temp=os.path.join(path,"../src/data_acquisitions/data/temp.csv")
+path_to_header=os.path.join(path,"../src/data_acquisitions/data/headers.csv")
 
 
 def establish_session(args):
@@ -66,33 +68,52 @@ def stop(data):
 
 
 def teardownsession(packed_data):
-    path=os.path.dirname(__file__)
-    path_to_file=os.path.join(path,"../src/data_acquisitions/data/official_data.csv")
-    path_to_temp=os.path.join(path,"../src/data_acquisitions/data/temp.csv")
-    header, header_set = [], set() #dynamic header for different no. of tags each daq
+    """ writting data """
+    curr_headers= header_storage(path_to_header) 
+    header_set = set(curr_headers) #set keeps header unique, non-retitive
+    
     #write all data to temp file w/o header
-    with open(path_to_temp,"w+") as f:
+    with open(path_to_temp,"a") as f:
         writer = csv.writer(f)
-        writer.writerow(" ")
         for data in packed_data:
-            for key in data:
+            for key in data.keys():
+                #check key's existence in set
                 if key not in header_set:
                     header_set.add(key)
-                    header.append(key)
-            writer.writerow(data.get(key," ") for key in header) 
+                    curr_headers.append(key)
+                #default to blank for header w/o data
+            writer.writerow(data.get(key," ") for key in curr_headers) 
     f.close()
-    #append header, write data to offical daq file
+
+    #write headers of the current call to  the header file 
+    write_headers_to_file(curr_headers,path_to_header) 
+
+def finalize_csv(path_to_file,path_to_temp,path_to_header): 
+    try: 
+        headers=open(path_to_header,"r").readlines()[-1]
+    except IndexError: 
+        return 
     with open(path_to_file,"w+") as g:
         f=open(path_to_temp,"r")
         writer = csv.writer(g)
-        g.write(','.join(header)+f.read())
+        g.write(headers+f.read())
          
     
 
 
+def header_storage(path_to_header):
+    f= open(path_to_header,"r").readlines() 
+    headers= [] if not f else f[-1].strip().split(",")   #retrieve most updated header 
+    return headers
 
 
 
+def write_headers_to_file(headers_to_be_written,path_to_header): 
+    with open(path_to_header,"a") as f:
+        writer = csv.writer(f)
+        print(headers_to_be_written)
+        writer.writerow(headers_to_be_written)
+    f.close()
 
 
 

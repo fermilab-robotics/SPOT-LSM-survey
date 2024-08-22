@@ -25,7 +25,8 @@ from bosdyn.client.service_customization_helpers import (InvalidCustomParamSpecE
 from bosdyn.client.util import setup_logging
 from bosdyn.mission import util
 
-from main_daq import establish_session,main_daq,tick,stop,teardownsession
+from main_daq import (establish_session,tick,stop,teardownsession,finalize_csv,
+                      main_daq,path_to_file,path_to_header,path_to_temp)
 DIRECTORY_NAME = 'hello-world-callback'
 AUTHORITY = 'remote-mission'
 SERVICE_TYPE = 'bosdyn.api.mission.RemoteMissionService'
@@ -59,6 +60,7 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         self.robot=None
         self.data=None
         self.data_to_be_written=None
+        
         try:
             # Validate the custom parameters.
             validate_dict_spec(self.custom_params)
@@ -154,4 +156,9 @@ if __name__ == '__main__':
     keep_alive.start(DIRECTORY_NAME, SERVICE_TYPE, AUTHORITY, options.host_ip, service_runner.port)
 
     with keep_alive:
-        service_runner.run_until_interrupt()
+        try: 
+            service_runner.run_until_interrupt()
+        finally:
+            finalize_csv(path_to_file,path_to_temp,path_to_header)
+    
+
