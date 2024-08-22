@@ -33,7 +33,8 @@ class Spot(Localization):
     
         """
         key_frame="vision"
-        return get_a_tform_b(self.xformsnapshot(),key_frame,"body")
+        # return get_a_tform_b(self.xformsnapshot(),key_frame,"body")
+        return get_a_tform_b(self._robot_state_client.get_robot_state().kinematic_state.transforms_snapshot,key_frame,"body")
 
     def odomxform(self):
         """

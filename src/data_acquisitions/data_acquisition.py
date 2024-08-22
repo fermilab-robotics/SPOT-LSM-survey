@@ -1,10 +1,17 @@
 from bosdyn.client.math_helpers import quat_to_eulerZYX
 from collections import defaultdict,namedtuple
-import datetime
-import json
+
+import os
+from datetime import datetime
+import time
+
 
 Data = namedtuple('data', ['time','data'])
 Frames = namedtuple('frame', ['yaw','pitch','roll'])
+
+#set timezone 
+os.environ['TZ'] = 'CST6CDT'
+time.tzset()
 
 def quat_to_Euler(frame):
     """
@@ -36,18 +43,20 @@ class DataAcquisition():
             daq for spot data
         """
         time=self.robot.get_time()
+        
         self.bot_flag=True
         vision=self.robot.visionxform()
+    
         # odom=self.robot.odomxform()
         self.data_pts+=1
         self.bot_data[time]={}
-        self.bot_data[time].update({'vision':vision})
+        self.bot_data[time].update({'vision':vision.get_translation()})
         bot_euler_angle=quat_to_Euler(vision)
         self.bot_data[time].update({'yaw':bot_euler_angle.yaw})
         self.bot_data[time].update({'pitch':bot_euler_angle.pitch})
         self.bot_data[time].update({'roll':bot_euler_angle.roll})
         # self.bot_data[time].update({'odom':odom})
-        self.data[self.data_pts]['spot']={time:self.bot_data[time]}
+        self.data['spot']={time:self.bot_data[time]}
     
     def tag_daq(self):
         """
@@ -56,17 +65,31 @@ class DataAcquisition():
         if not self.bot_flag:
             print("Take spot's localization first")
         else:     
-            time=self.tag.get_time()
+            
             vision=self.tag.visionxform()
+            time=self.tag.get_time()
             # odom=self.tag.odomxform()
             self.tag_data[time]={}
-            self.tag_data[time].update({'vision':vision})
-            tag_euler_angle=quat_to_Euler(vision)
-            self.tag_data[time].update({'yaw':tag_euler_angle.yaw})
-            self.tag_data[time].update({'pitch':tag_euler_angle.pitch})
-            self.tag_data[time].update({'roll':tag_euler_angle.roll})
+            
+            
+            for idx,f in enumerate(self.tag.fiducial): 
+            
+                
+                self.tag_data[time].update({f.name:{}})
+                self.tag_data[time][f.name].update({'vision':vision[idx].get_translation()})
+                tag_euler_angle=quat_to_Euler(vision[idx])
+                self.tag_data[time][f.name].update({'yaw':tag_euler_angle.yaw})
+                self.tag_data[time][f.name].update({'picth':tag_euler_angle.pitch})
+                self.tag_data[time][f.name].update({'roll':tag_euler_angle.roll})
+
+
+            # self.tag_data[time].update({'vision':vision})
+            # tag_euler_angle=quat_to_Euler(vision)
+            # self.tag_data[time].update({'yaw':tag_euler_angle.yaw})
+            # self.tag_data[time].update({'pitch':tag_euler_angle.pitch})
+            # self.tag_data[time].update({'roll':tag_euler_angle.roll})
             # self.tag_data[time].update({'odom':odom})
-            self.data[self.data_pts]['tag']={time:self.tag_data[time]}
+            self.data['tag']={time:self.tag_data[time]}
 
      
 
@@ -77,13 +100,15 @@ class DataAcquisition():
         if self.digitizer.get_config():
             dose=list(self.digitizer.start())
             time=datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+           
             # self.r_data[self.data_pts]=Data(time,dose)
             self.r_data[time]={}
             self.r_data[time].update({"mrem_p_h":dose[0]})
             self.r_data[time].update({"counts_per_second":dose[1]})
+          
             self.r_data[time].update({"mrem":dose[2]})
             self.r_data[time].update({"duration":dose[3]})
-            self.data[self.data_pts]['mirion']={time:self.r_data[time]}
+            self.data['mirion']={time:self.r_data[time]}
             
 
         

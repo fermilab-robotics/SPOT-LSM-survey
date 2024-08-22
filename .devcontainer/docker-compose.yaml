@@ -1,6 +1,6 @@
 services:
   spot-lsm:
-    image: test:latest
+    image: spot-mirion
     container_name: container-spot-lsm
     environment:
       - TZ=America/Chicago
@@ -11,11 +11,11 @@ services:
       - /run/udev:/run/udev:ro
       - /dev/bus/usb:/dev/bus/usb
       - /dev/ttyACM0:/dev/ttyACM0
-      #time zone 
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
+     
     env_file:
       - .env
+    ports:
+      - "127.0.0.1:5000:5000"
     privileged: true
     # command: ["${spot_host}"]
     #uncomment two lines below to exec into the containe for debugging
