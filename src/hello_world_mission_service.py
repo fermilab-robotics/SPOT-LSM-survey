@@ -9,6 +9,7 @@
 import logging
 import sys
 import os
+from datetime import datetime
 
 import bosdyn.client
 import bosdyn.client.util
@@ -32,8 +33,7 @@ AUTHORITY = 'remote-mission'
 SERVICE_TYPE = 'bosdyn.api.mission.RemoteMissionService'
 
 _LOGGER = logging.getLogger(__name__)
-_WHO_KEY = 'who'
-
+_ID_KEY="robotic-group"
 
 class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
     """Every tick, logs 'Hello world!'
@@ -47,16 +47,6 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         self.logger = logger or _LOGGER
         # Create the custom parameters.
         self.custom_params = service_customization_pb2.DictParam.Spec()
-        who_param = service_customization_pb2.StringParam.Spec()
-        who_param.default_value = "World"
-        who_param.editable = True
-        who_ui_info = service_customization_pb2.UserInterfaceInfo()
-        who_ui_info.display_name = "Name"
-        who_ui_info.description = "Who Spot will say hello to"
-        dict_spec = service_customization_pb2.DictParam.Spec()
-        dict_spec.specs[_WHO_KEY].spec.string_spec.CopyFrom(who_param)
-        dict_spec.specs[_WHO_KEY].ui_info.CopyFrom(who_ui_info)
-        self.custom_params.CopyFrom(dict_spec)
         self.robot=None
         self.data=None
         self.data_to_be_written=None
@@ -70,29 +60,29 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
             self.custom_params.Clear()
 
     def Tick(self, request, context):
-        """Logs text, then provides a valid response."""
+        """Logs time of taking data"""
         response = remote_pb2.TickResponse()
         
         # This utility context manager will fill out some fields in the message headers.
         with ResponseContext(response, request):
             handler=main_daq(self.robot)
             self.data=tick(handler)
-            # Default to saying hello to 'World'.
-            name = 'World'
-            who = request.params.values.get(_WHO_KEY)
-            if who is not None:
-                name = who.string_value.value
-            self.logger.info('Hello %s!', name)
+            self.logger.info('Taking data at %s!\n',datetime.now())
             response.status = remote_pb2.TickResponse.STATUS_SUCCESS
         return response
 
     def EstablishSession(self, request, context):
+        """ Setting up env for API call"""
         response = remote_pb2.EstablishSessionResponse()
         usrname=os.getenv("BOSDYN_CLIENT_USERNAME")
         password=os.getenv("BOSDYN_CLIENT_PASSWORD")
         spot_host=os.getenv("spot_host")
+        assert usrname!=None,"username is not provided"
+        assert password!=None,"password is not provided"
+        assert spot_host!=None,"SPOT host ip is not provided"
+        
         with ResponseContext(response, request):
-            self.logger.info('EstablishSession started')
+            self.logger.info('Environment Setup Success')
             self.robot=establish_session([spot_host])
             response.status = remote_pb2.EstablishSessionResponse.STATUS_OK
         return response
@@ -155,6 +145,7 @@ if __name__ == '__main__':
     keep_alive = DirectoryRegistrationKeepAlive(dir_reg_client, logger=_LOGGER)
     keep_alive.start(DIRECTORY_NAME, SERVICE_TYPE, AUTHORITY, options.host_ip, service_runner.port)
 
+    # at the end of session, combine finalized headers with data. 
     with keep_alive:
         try: 
             service_runner.run_until_interrupt()
