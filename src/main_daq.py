@@ -39,6 +39,7 @@ def main_daq(robot):
 def tick(daq_handler): 
     daq_handler.bot_daq()
     daq_handler.tag_daq()
+    daq_handler.d_daq()
     return daq_handler.data
 
 
@@ -46,6 +47,7 @@ def stop(data):
     """process obtained data"""
     spot_header=['spot_time','spot_vision','spot_vy','spot_vp','spot_vr']
     tag_header=None
+    mirion_header=["mirion_time","mrem_p_h","counts_per_second","mrem","duration"]
     for obj in data:
         if obj=="spot":
             spot_time=list(data[obj].keys())[0]
@@ -65,6 +67,13 @@ def stop(data):
                 tag_data_arr=[tag_time,*tags[tag].values()]
                 tag_data_to_be_written={h:d for h,d in zip(tag_header,tag_data_arr)}
                 yield tag_data_to_be_written
+        if obj=='mirion':
+            mirion_time=list(data[obj].keys())[0]
+            mirion_data=data[obj][mirion_time]
+            mirion_data_arr=[mirion_time,*mirion_data.values()]
+            mirion_data_to_be_written={h:d for h,d in zip(mirion_header,mirion_data_arr)}
+            yield mirion_data_to_be_written
+
 
 
 def teardownsession(packed_data):
@@ -111,7 +120,6 @@ def header_storage(path_to_header):
 def write_headers_to_file(headers_to_be_written,path_to_header): 
     with open(path_to_header,"a") as f:
         writer = csv.writer(f)
-        print(headers_to_be_written)
         writer.writerow(headers_to_be_written)
     f.close()
 

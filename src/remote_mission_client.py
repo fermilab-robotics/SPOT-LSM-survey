@@ -24,14 +24,13 @@ _WHO_KEY = 'who'
 
 def main():
     parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--hello-world', action='store_true',
-                       help='Target the Hello World remote mission service.')
-    group.add_argument('--power-off', action='store_true',
-                       help='Target the Power Off remote mission service.')
-    parser.add_argument(
-        '--user-string',
-        help='Specify the user-string input to Tick. Set to the node name in Autowalk missions.')
+    # group = parser.add_mutually_exclusive_group(required=True)
+    # group.add_argument('--hello-world', action='store_true',
+    #                    help='Target the Hello World remote mission service.')
+   
+    # parser.add_argument(
+    #     '--user-string',
+    #     help='Specify the user-string input to Tick. Set to the node name in Autowalk missions.')
 
     subparsers = parser.add_subparsers(help='Select how this service will be accessed.',
                                        dest='host_type')
@@ -45,12 +44,10 @@ def main():
 
     options = parser.parse_args()
 
-    if options.hello_world:
-        directory_name = 'hello-world-callback'
-        lease_resources = ()
-    elif options.power_off:
-        directory_name = 'power-off-callback'
-        lease_resources = bosdyn.client.lease.DEFAULT_RESOURCES
+
+    directory_name = 'hello-world-callback'
+    lease_resources = ()
+
 
     # If attempting to communicate directly to the service.
     if options.host_type == 'local':
@@ -73,9 +70,7 @@ def main():
 
     input_params = service_customization_pb2.DictParam()
 
-    if options.user_string:
-        input_params.values.get_or_create(_WHO_KEY).string_value.value = options.user_string
-
+  
     # Use an ExitStack because we might or might not have a lease keep-alive
     # depending on command line arguments
     with ExitStack() as exit_stack:

@@ -99,7 +99,7 @@ class DataAcquisition():
         """
         if self.digitizer.get_config():
             dose=list(self.digitizer.start())
-            time=datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+            time=datetime.now().strftime("%m/%d/%Y %H:%M:%S")
            
             # self.r_data[self.data_pts]=Data(time,dose)
             self.r_data[time]={}
