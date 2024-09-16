@@ -107,20 +107,6 @@ Run the container
 
 All obtained data is located in `src/data_acquisitions/data`
 
-### ⚓ ACTION OPTIONS 
-
-There are three action options that could be passed to the `-a` flag: 
-- `1` : Enter mode to take localization data, data is stored to be processed later
-    - After SPOT finishes taking data at each location, there will be prompt questions asking if SPOT is walking to the next location, if YES, the process continues, if NO the program exits.
-
-- `2` : Enter mode to process previously collected data. There are two options for this mode, question will be prompted on the screen for you to pick your option: 
-    - Option `1` : process with the lastest data file obtained
-    - Option `2` : list all raw data files, you pick the file you want to process
-    
-    
-- `3` : Enter mode to take localization data, then export data to csv file after SPOT finishes the walk.  
-    - This is the default option if nothing is specified.
-    - This mode proceeds to take localization data, then export the data to a CSV file right after.   
 
 
 ### ⛵ DIGITIZER OPTIONS
