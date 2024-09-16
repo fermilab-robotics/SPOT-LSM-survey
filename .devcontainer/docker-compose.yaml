@@ -5,9 +5,9 @@ services:
     restart: always
     environment:
       - TZ=America/Chicago
-      - BOSDYN_CLIENT_USERNAME=<your-user>
-      - BOSDYN_CLIENT_PASSWORD=<your-password>
-      - spot_host=<host>
+      - BOSDYN_CLIENT_USERNAME=linhphambuzz
+      - BOSDYN_CLIENT_PASSWORD=DogWalker244
+      - spot_host=spot-bd-11720001-p.dhcp.fnal.gov
     env_file:
       - .env
     volumes:
@@ -19,10 +19,10 @@ services:
       - /dev/ttyACM0:/dev/ttyACM0
     network_mode: host
     ports:
-      - "127.0.0.1:5000:5000"
+      - "5000:5000"
     privileged: true
     command: ${test_ip} ${spot_host}
     #uncomment two lines below to exec into the containe for debugging
-    # entrypoint: [ "/bin/bash", "-c" ]
-    # command: [ "while true; do sleep 30; done;" ]
+    #entrypoint: [ "/bin/bash", "-c" ]
+    #command: [ "while true; do sleep 30; done;" ]
     
