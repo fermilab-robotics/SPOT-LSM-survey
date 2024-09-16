@@ -4,7 +4,10 @@ from collections import defaultdict,namedtuple
 import os
 from datetime import datetime
 import time
+import logging 
 
+
+logger=logging.getLogger(__name__)
 
 Data = namedtuple('data', ['time','data'])
 Frames = namedtuple('frame', ['yaw','pitch','roll'])
@@ -35,7 +38,7 @@ class DataAcquisition():
         self.r_data=defaultdict(set)
         self.bot_flag=False
         self.data_pts=0
-        print('ready to take data..')
+
 
 
     def bot_daq(self):
@@ -55,8 +58,8 @@ class DataAcquisition():
         self.bot_data[time].update({'yaw':bot_euler_angle.yaw})
         self.bot_data[time].update({'pitch':bot_euler_angle.pitch})
         self.bot_data[time].update({'roll':bot_euler_angle.roll})
-        # self.bot_data[time].update({'odom':odom})
         self.data['spot']={time:self.bot_data[time]}
+        logger.info("data for spot taken")
     
     def tag_daq(self):
         """
@@ -74,7 +77,6 @@ class DataAcquisition():
             
             for idx,f in enumerate(self.tag.fiducial): 
             
-                
                 self.tag_data[time].update({f.name:{}})
                 self.tag_data[time][f.name].update({'vision':vision[idx].get_translation()})
                 tag_euler_angle=quat_to_Euler(vision[idx])
@@ -82,14 +84,8 @@ class DataAcquisition():
                 self.tag_data[time][f.name].update({'picth':tag_euler_angle.pitch})
                 self.tag_data[time][f.name].update({'roll':tag_euler_angle.roll})
 
-
-            # self.tag_data[time].update({'vision':vision})
-            # tag_euler_angle=quat_to_Euler(vision)
-            # self.tag_data[time].update({'yaw':tag_euler_angle.yaw})
-            # self.tag_data[time].update({'pitch':tag_euler_angle.pitch})
-            # self.tag_data[time].update({'roll':tag_euler_angle.roll})
-            # self.tag_data[time].update({'odom':odom})
             self.data['tag']={time:self.tag_data[time]}
+            logger.info("data for tag taken")
 
      
 
@@ -109,6 +105,9 @@ class DataAcquisition():
             self.r_data[time].update({"mrem":dose[2]})
             self.r_data[time].update({"duration":dose[3]})
             self.data['mirion']={time:self.r_data[time]}
+            logger.info("data for mirion taken")
+        else:
+            logger.warning("port can't be accessed!!!")
             
 
         

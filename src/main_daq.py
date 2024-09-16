@@ -140,25 +140,6 @@ def write_headers_to_file(headers_to_be_written,path_to_header):
 
 
 
-   
-    
-    # else: 
-    #     # rad_detector.stop()
-    #     file=input("name file? \n")
-    #     file_path = os.path.dirname(__file__)
-    #     with open(os.path.join(file_path,f"data_acquisitions/data/{file}.json"),"w+") as f: 
-    #         json.dump(d.data,f,default=lambda o: o.__dict__,indent=4)
-                   
-                # if user wants data exported to csv after walking the robot
-                # if options.action!="1": 
-                #     process_data(f'{file}.json')
-                   
-        # print("exiting..")
-                # break
-    
-   
-
-
 
 
 

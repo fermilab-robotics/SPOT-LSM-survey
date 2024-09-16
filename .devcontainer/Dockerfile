@@ -14,15 +14,6 @@ RUN apt-get install -y git udev
 RUN pip --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
    && rm -rf /tmp/pip-tmp
 
-#libusb is required for exodriver 
-#see https://github.com/labjack/exodriver/blob/master/INSTALL.Linux
-# RUN export DEBIAN_FRONTEND=noninteractive && export DEBIAN_FRONTEND=noninteractive \
-#    && apt-get -y install --no-install-recommends libusb-1.0-0-dev  
-
-#exodriver
-# RUN git clone --depth=1 --verbose https://github.com/labjack/exodriver.git \
-#    && cd exodriver && ./install.sh
-
 COPY . . 
 RUN chmod +x port_detection.sh entrypoint.sh
 
