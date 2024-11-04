@@ -65,11 +65,10 @@ def stop(data):
 
     """process obtained data"""
 
-    spot_header=['spot_time','spot_vision','spot_vy','spot_vp','spot_vr']
+    spot_header=['Timestamp','Position X','Position Y','Position Z','Pitch','Roll','Yaw']
     tag_header=None
-    mirion_header=["mirion_time","mrem_p_h","counts_per_sec"]
+    mirion_header=["mirion_time","Radiation(mrem/h)","Radiation(counts/sec)"]
 
-    # 
 
     with open(path_to_temp,'a+') as file: 
         fieldnames=[]
@@ -104,7 +103,7 @@ def stop(data):
                 tags=data[obj][tag_time]
                 tag_names=[tags.keys()]
                 for tag_idx,tag in enumerate(tags):
-                    tag_header='tag_time',f'{tag}_vision',f'{tag}_vy',f'{tag}_vp',f'{tag}_vr'
+                    tag_header=f'{tag}_time',f'{tag}_Position_X',f'{tag}_Position_Y',f'{tag}_Position_Z',f'{tag}_Pitch',f'{tag}_Roll',f'{tag}_Yaw'
                     fieldnames+=tag_header
                     tag_data_arr=[tag_time,*tags[tag].values()]
                     assert len(tag_header)==len(tag_data_arr), f"tag {tag} headers and values not equal"
