@@ -121,7 +121,7 @@ def stop(data):
 
 def teardownsession():
     """ writting data """
-    temp=open(path_to_temp,'r').read().split("\n\n")
+    temp=open(path_to_temp,'r').read().strip().split("\n\n")
     file_name=None 
 
     data=defaultdict(dict)
@@ -132,7 +132,7 @@ def teardownsession():
     # the first value of a data block will always be spot_time, this will be the time
     # we sttart taking data,  set this value to be our file name
     for data_block in temp:
-        
+
         chunk_data=defaultdict(str)
         
         for header_line,value_line in zip(data_block.split("\n")[::2],data_block.split("\n")[1::2]): 
@@ -144,8 +144,9 @@ def teardownsession():
                     chunk_data[h]=v
                     file_name=v if not file_name else file_name 
 
-            data[data_pnt]=chunk_data
-            data_pnt+=1
+        data[data_pnt]=chunk_data
+        data_pnt+=1
+        
 
     #write data to file
     assert file_name!=None, "file_name is NULL"
