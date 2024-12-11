@@ -7,7 +7,7 @@ services:
       - TZ=America/Chicago
       - BOSDYN_CLIENT_USERNAME=linhphambuzz
       - BOSDYN_CLIENT_PASSWORD=DogWalker244
-      - spot_host=spot-bd-11720001-p.dhcp.fnal.gov
+      - spot_host=192.168.50.3
     env_file:
       - .env
     volumes:
