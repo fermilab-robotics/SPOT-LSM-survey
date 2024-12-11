@@ -67,8 +67,10 @@ def stop(data):
 
     spot_header=['Timestamp','Position X','Position Y','Position Z','Pitch','Roll','Yaw']
     tag_header=None
-    mirion_header=["mirion_time","Radiation(mrem/h)","Radiation(counts/sec)"]
-
+    mirion_header=["Radiation(mrem/h)","Radiation(counts/sec)"]
+    logger=_LOGGER
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
 
     with open(path_to_temp,'a+') as file: 
         fieldnames=[]
@@ -89,7 +91,7 @@ def stop(data):
             if obj=='mirion':
                 mirion_time=list(data[obj].keys())[0]
                 mirion_data=data[obj][mirion_time]
-                mirion_data_arr=[mirion_time] + list(mirion_data.values())[:2] #slicing for only mrem_per_hour and cnt/sec
+                mirion_data_arr= list(mirion_data.values())[:2] #slicing for only mrem_per_hour and cnt/sec
                 assert len(mirion_header)==len(mirion_data_arr), "mirion headers-values not equal"
 
                 fieldnames+=mirion_header
@@ -103,10 +105,12 @@ def stop(data):
                 tags=data[obj][tag_time]
                 tag_names=[tags.keys()]
                 for tag_idx,tag in enumerate(tags):
-                    tag_header=f'{tag}_time',f'{tag}_Position_X',f'{tag}_Position_Y',f'{tag}_Position_Z',f'{tag}_Pitch',f'{tag}_Roll',f'{tag}_Yaw'
+                    tag_header=f'{tag}_Position_X',f'{tag}_Position_Y',f'{tag}_Position_Z',f'{tag}_Pitch',f'{tag}_Roll',f'{tag}_Yaw'
                     fieldnames+=tag_header
-                    tag_data_arr=[tag_time,*tags[tag].values()]
-                    assert len(tag_header)==len(tag_data_arr), f"tag {tag} headers and values not equal"
+                    logger.debug(f'tag header: {tag_header}')
+                    tag_data_arr=[*tags[tag].values()]
+                    logger.debug(f'tag data: {tag_data_arr}')
+                    assert len(tag_header)==len(tag_data_arr), f"{tag} headers w len {len(tag_header)} isn't equal {len(tag_data_arr)}"
 
                     tag_data_to_be_written={h:d for h,d in zip(tag_header,tag_data_arr)}
                     writer2=csv.DictWriter(file,fieldnames=fieldnames)
@@ -127,6 +131,8 @@ def teardownsession():
     data=defaultdict(dict)
     data_pnt=0
     field_headers=[]
+    
+    logger=_LOGGER
 
     # treat each chunk of (spot,mirion,tag1,tag2,..) as a data_block for one data point
     # the first value of a data block will always be spot_time, this will be the time
@@ -150,7 +156,7 @@ def teardownsession():
 
     #write data to file
     assert file_name!=None, "file_name is NULL"
-    path_to_file=os.path.join(path,f"../src/data_acquisitions/data/{file_name}")
+    path_to_file=os.path.join(path,f"../src/data_acquisitions/data/{file_name}.csv")
     with open(path_to_file, 'w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=field_headers)
         writer.writeheader()
