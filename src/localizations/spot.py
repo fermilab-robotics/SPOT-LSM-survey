@@ -1,4 +1,4 @@
-from time import ctime
+from datetime import datetime
 
 from bosdyn.api import robot_state_pb2, robot_state_service_pb2_grpc
 from bosdyn.client.robot_state import RobotStateClient
@@ -49,7 +49,8 @@ class Spot(Localization):
         """
             get timestamps
         """
-        return ctime(self._robot_state.kinematic_state.acquisition_timestamp.seconds)
+        # return ctime(self._robot_state.kinematic_state.acquisition_timestamp.seconds)
+        return datetime.now().strftime("%m_%d_%Y_%H:%M:%S")
 
     
 

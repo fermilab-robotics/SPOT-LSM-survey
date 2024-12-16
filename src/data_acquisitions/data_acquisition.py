@@ -37,7 +37,6 @@ class DataAcquisition():
         self.tag_data=defaultdict(dict)
         self.r_data=defaultdict(set)
         self.bot_flag=False
-        self.data_pts=0
 
 
 
@@ -49,43 +48,49 @@ class DataAcquisition():
         
         self.bot_flag=True
         vision=self.robot.visionxform()
-    
-        # odom=self.robot.odomxform()
-        self.data_pts+=1
+        Position_X,Position_Y,Position_Z=vision.get_translation()
+
         self.bot_data[time]={}
-        self.bot_data[time].update({'vision':vision.get_translation()})
+        self.bot_data[time].update({'Position X':Position_X})
+        self.bot_data[time].update({'Position Y':Position_Y})
+        self.bot_data[time].update({'Position Z':Position_Z})
+
         bot_euler_angle=quat_to_Euler(vision)
-        self.bot_data[time].update({'yaw':bot_euler_angle.yaw})
-        self.bot_data[time].update({'pitch':bot_euler_angle.pitch})
-        self.bot_data[time].update({'roll':bot_euler_angle.roll})
+        self.bot_data[time].update({'Pitch':bot_euler_angle.pitch})
+        self.bot_data[time].update({'Roll':bot_euler_angle.roll})
+        self.bot_data[time].update({'Yaw':bot_euler_angle.yaw})
+        
         self.data['spot']={time:self.bot_data[time]}
-        logger.info("data for spot taken")
+        logger.info(f"data for spot taken at {time}")
     
     def tag_daq(self):
         """
             daq for april tag data 
         """
         if not self.bot_flag:
-            print("Take spot's localization first")
+            logger.warning("Take spot's localization first")
         else:     
             
             vision=self.tag.visionxform()
+            
             time=self.tag.get_time()
-            # odom=self.tag.odomxform()
             self.tag_data[time]={}
             
-            
             for idx,f in enumerate(self.tag.fiducial): 
-            
                 self.tag_data[time].update({f.name:{}})
-                self.tag_data[time][f.name].update({'vision':vision[idx].get_translation()})
+                logger.info(f"data for {f.name} taken at {time}")
+                tag_position_X,tag_position_Y,tag_position_Z= vision[idx].get_translation()
+                self.tag_data[time][f.name].update({'Position X':tag_position_X})
+                self.tag_data[time][f.name].update({'Position Y':tag_position_Y})
+                self.tag_data[time][f.name].update({'Position Z':tag_position_Z})
+
                 tag_euler_angle=quat_to_Euler(vision[idx])
-                self.tag_data[time][f.name].update({'yaw':tag_euler_angle.yaw})
-                self.tag_data[time][f.name].update({'picth':tag_euler_angle.pitch})
-                self.tag_data[time][f.name].update({'roll':tag_euler_angle.roll})
+                self.tag_data[time][f.name].update({'Picth':tag_euler_angle.pitch})
+                self.tag_data[time][f.name].update({'Roll':tag_euler_angle.roll})
+                self.tag_data[time][f.name].update({'Yaw':tag_euler_angle.yaw})
 
             self.data['tag']={time:self.tag_data[time]}
-            logger.info("data for tag taken")
+            # logger.info(f"data for tags taken at {time}")
 
      
 
@@ -95,7 +100,7 @@ class DataAcquisition():
         """
         if self.digitizer.get_config():
             dose=list(self.digitizer.start())
-            time=datetime.now().strftime("%m/%d/%Y %H:%M:%S")
+            time=datetime.now().strftime("%m_%d_%Y_%H:%M:%S")
            
             # self.r_data[self.data_pts]=Data(time,dose)
             self.r_data[time]={}
@@ -105,7 +110,7 @@ class DataAcquisition():
             self.r_data[time].update({"mrem":dose[2]})
             self.r_data[time].update({"duration":dose[3]})
             self.data['mirion']={time:self.r_data[time]}
-            logger.info("data for mirion taken")
+            logger.info(f"data for mirion taken at {time}")
         else:
             logger.warning("port can't be accessed!!!")
             

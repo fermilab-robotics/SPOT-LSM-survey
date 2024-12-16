@@ -9,9 +9,7 @@ fi
 
 # get the host ip of CORE, or host where the mission service is running  
 python3 src/get_self_ip.py
-echo $test_ip
-python3 src/main.py --host-ip $test_ip $spot_host
 
-exec "$@" 
+python3 src/main.py --host-ip $test_ip --port 5000 $spot_host
 
-
+exec "$@"

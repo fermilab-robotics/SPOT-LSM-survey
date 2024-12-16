@@ -1,4 +1,4 @@
-from time import ctime
+from datetime import datetime
 
 from bosdyn.api import world_object_pb2
 from bosdyn.client.world_object import WorldObjectClient 
@@ -74,8 +74,8 @@ class AprilTag(Localization):
         """
             get tag time 
         """
-        time=self.fiducial[0].acquisition_time.seconds
-        return ctime(time)
+        # time=self.fiducial[0].acquisition_time.seconds
+        return datetime.now().strftime("%m_%d_%Y_%H:%M:%S")
 
 
 

@@ -50,6 +50,7 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         self.robot=None
         self.data=None
         self.data_to_be_written=None
+  
         
         try:
             # Validate the custom parameters.
@@ -82,7 +83,7 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         assert spot_host!=None,"SPOT host ip is not provided"
         
         with ResponseContext(response, request):
-            self.logger.info('Environment Setup Success')
+            self.logger.info('Environment Setup Success \n please empty out your temp.csv if this is the start of your daq session')
             self.robot=establish_session([spot_host])
             response.status = remote_pb2.EstablishSessionResponse.STATUS_OK
         return response
@@ -90,8 +91,8 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
     def Stop(self, request, context):
         response = remote_pb2.StopResponse()
         with ResponseContext(response, request):
-            self.logger.info('Preping data to be written to file')
-            self.data_to_be_written=stop(self.data)
+            self.logger.info('Writting data to temp file')
+            stop(self.data)
             response.status = remote_pb2.StopResponse.STATUS_OK
         return response
 
@@ -99,8 +100,8 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         response = remote_pb2.TeardownSessionResponse()
         
         with ResponseContext(response, request):
-            teardownsession(self.data_to_be_written)
-            self.logger.info('Writting data to csv file')
+            teardownsession()
+            self.logger.info(f'Writting data to csv file')
             response.status = remote_pb2.TeardownSessionResponse.STATUS_OK
         return response
 
@@ -147,9 +148,7 @@ if __name__ == '__main__':
 
     # at the end of session, combine finalized headers with data. 
     with keep_alive:
-        try: 
-            service_runner.run_until_interrupt()
-        finally:
-            finalize_csv(path_to_file,path_to_temp,path_to_header)
+       
+        service_runner.run_until_interrupt()
     
 
