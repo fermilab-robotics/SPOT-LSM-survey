@@ -8,10 +8,11 @@ Radiation survey with digitized Log Survey Meter (LSM) and Boston Dynamic SPOT r
 <p align="center"><img src="./img/FNAL-Logo-NAL-Blue.png" width="200" height="auto"></p>
 
 <div align="center" >
-<a href="https://github.com/boston-dynamics/spot-sdk"><img src="https://img.shields.io/badge/spot--sdk-FBD403?style=flat"/></a>
-<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-blue?logo=docker&logoColor=white"/></a>
-<a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.7-3776AB.svg?style=flat&logo=python&logoColor=white"/></a>
-<a href="https://labjack.com/"><img src="https://img.shields.io/badge/LabJackPython-2.1.0-8B0000?style=flat"/></a>
+<a href="https://github.com/boston-dynamics/spot-sdk"><img src="https://img.shields.io/badge/SPOT--SDK-3.3.2-%23FBD403?style=for-the-badge"/></a>
+<a href="https://www.docker.com/"><img src="https://img.shields.io/badge/docker-blue?style=for-the-badge&logo=docker"/></a>
+<a href="https://www.python.org"><img src="https://img.shields.io/badge/python-3.9-blue?style=for-the-badge&logo=python
+"/></a>
+
 </div>
 
 
