@@ -1,0 +1,12 @@
+FROM python:3.9-slim-bullseye
+
+WORKDIR /spot-api
+#RUN apt-get update && apt-get install -y python3.9
+COPY requirements.txt /tmp/pip-tmp/
+RUN pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
+    && rm -rf /tmp/pip-tmp
+
+COPY . .
+
+ENTRYPOINT ["python3","src/drain-temp.py"]
+

@@ -26,14 +26,15 @@ from bosdyn.client.service_customization_helpers import (InvalidCustomParamSpecE
 from bosdyn.client.util import setup_logging
 from bosdyn.mission import util
 
-from main_daq import (establish_session,tick,stop,teardownsession,finalize_csv,
-                      main_daq,path_to_file,path_to_header,path_to_temp)
 DIRECTORY_NAME = 'stopper-svc'
-AUTHORITY = 'remote-mission-1'
+AUTHORITY = 'remote-mission'
 SERVICE_TYPE = 'bosdyn.api.mission.RemoteMissionService'
 
 _LOGGER = logging.getLogger(__name__)
 _ID_KEY="robotic-group"
+
+path=os.path.dirname(__file__)
+path_to_temp=os.path.join(path,"./data_acquisitions/data/temp.csv")
 
 class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
     """Every tick, logs 'Hello world!'
@@ -63,13 +64,14 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
     def Tick(self, request, context):
         """Logs time of taking data"""
         response = remote_pb2.TickResponse()
-        
+            
         # This utility context manager will fill out some fields in the message headers.
         with ResponseContext(response, request):
-            handler=main_daq(self.robot)
-            self.data=tick(handler)
-            self.logger.info('Taking data at %s!\n',datetime.now())
-            response.status = remote_pb2.TickResponse.STATUS_SUCCESS
+                f=open(path_to_temp)
+                content=f.read()
+                print(content)
+                self.logger.info('drain temp file at %s!\n',datetime.now())
+                response.status = remote_pb2.TickResponse.STATUS_SUCCESS
         return response
 
     def EstablishSession(self, request, context):
@@ -83,16 +85,12 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         assert spot_host!=None,"SPOT host ip is not provided"
         
         with ResponseContext(response, request):
-            self.logger.info('Environment Setup Success \n please empty out your temp.csv if this is the start of your daq session')
-            self.robot=establish_session([spot_host])
             response.status = remote_pb2.EstablishSessionResponse.STATUS_OK
         return response
 
     def Stop(self, request, context):
         response = remote_pb2.StopResponse()
         with ResponseContext(response, request):
-            self.logger.info('Writting data to temp file')
-            stop(self.data)
             response.status = remote_pb2.StopResponse.STATUS_OK
         return response
 
@@ -100,8 +98,6 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         response = remote_pb2.TeardownSessionResponse()
         
         with ResponseContext(response, request):
-            teardownsession()
-            self.logger.info(f'Writting data to csv file')
             response.status = remote_pb2.TeardownSessionResponse.STATUS_OK
         return response
 

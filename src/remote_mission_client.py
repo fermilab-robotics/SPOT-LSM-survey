@@ -45,7 +45,8 @@ def main():
     options = parser.parse_args()
 
 
-    directory_name = 'hello-world-callback'
+    directory_name = 'stopper-svc'
+    # directory_name='hello-world-callback'
     lease_resources = ()
 
 
@@ -61,6 +62,7 @@ def main():
         sdk = bosdyn.client.create_standard_sdk('RemoteMissionClientExample')
         sdk.register_service_client(bosdyn.mission.remote_client.RemoteClient,
                                     service_name=directory_name)
+        print(f'service name:{directory_name}')
 
         robot = sdk.create_robot(options.hostname)
         bosdyn.client.util.authenticate(robot)
