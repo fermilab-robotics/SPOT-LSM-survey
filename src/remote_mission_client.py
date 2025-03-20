@@ -8,6 +8,7 @@
 
 import argparse
 import time
+import logging
 from contextlib import ExitStack
 
 import grpc
@@ -18,19 +19,13 @@ import bosdyn.mission.remote_client
 from bosdyn.api import service_customization_pb2
 from bosdyn.api.mission import remote_pb2
 
-
+logger= logging.getLogger(__name__)
 _WHO_KEY = 'who'
 
 
 def main():
     parser = argparse.ArgumentParser()
-    # group = parser.add_mutually_exclusive_group(required=True)
-    # group.add_argument('--hello-world', action='store_true',
-    #                    help='Target the Hello World remote mission service.')
-   
-    # parser.add_argument(
-    #     '--user-string',
-    #     help='Specify the user-string input to Tick. Set to the node name in Autowalk missions.')
+    parser.add_argument('--svc','-s',help='service: SPOT-LSM-svc or DRAIN-TEMP-svc',default='SPOT-LSM-svc')
 
     subparsers = parser.add_subparsers(help='Select how this service will be accessed.',
                                        dest='host_type')
@@ -44,9 +39,9 @@ def main():
 
     options = parser.parse_args()
 
+    #directoy name is the svc registered with the gRPC server
+    directory_name = options.svc
 
-    directory_name = 'stopper-svc'
-    # directory_name='hello-world-callback'
     lease_resources = ()
 
 
@@ -59,9 +54,10 @@ def main():
     # Else if attempting to communicate through the robot.
     else:
         # Register the remote mission client with the SDK instance.
-        sdk = bosdyn.client.create_standard_sdk('RemoteMissionClientExample')
+        sdk = bosdyn.client.create_standard_sdk(directory_name)
         sdk.register_service_client(bosdyn.mission.remote_client.RemoteClient,
                                     service_name=directory_name)
+        
         print(f'service name:{directory_name}')
 
         robot = sdk.create_robot(options.hostname)
@@ -94,6 +90,7 @@ def main():
 
         # Begin ticking, and tick until the server indicates something other than RUNNING.
         response = client.tick(session_id, lease_resources=lease_resources, params=input_params)
+        print(f'session id {session_id}')
         while response.status == remote_pb2.TickResponse.STATUS_RUNNING:
             time.sleep(0.1)
             response = client.tick(session_id, lease_resources=lease_resources, params=input_params)
