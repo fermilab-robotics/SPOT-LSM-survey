@@ -16,14 +16,13 @@ from data_acquisitions.data_acquisition import DataAcquisition
 
 path=os.path.dirname(__file__)
 path_to_data_dir=os.path.join(path,"../src/data_acquisitions/data/")
-path_to_file=os.path.join(path,"../src/data_acquisitions/data/official_data.csv")
-path_to_temp=os.path.join(path,"../src/data_acquisitions/data/temp.csv")
-path_to_header=os.path.join(path,"../src/data_acquisitions/data/headers.csv")
+path_to_temp=os.path.join(path,"../src/data_acquisitions/data/history.csv")
 
 _LOGGER = logging.getLogger(__name__)
 
 
 def establish_session(args):
+    """ routine to handle sdk & spot object to call API """
     parser=argparse.ArgumentParser(args)
     bosdyn.client.util.add_base_arguments(parser)
     options=parser.parse_args(args)
@@ -74,7 +73,6 @@ def stop(data):
 
     with open(path_to_temp,'a+') as file: 
         fieldnames=[]
-        
         for obj in data:
             if obj=="spot":
                 spot_time=list(data[obj].keys())[0]
@@ -107,9 +105,9 @@ def stop(data):
                 for tag_idx,tag in enumerate(tags):
                     tag_header=f'{tag}_Position_X',f'{tag}_Position_Y',f'{tag}_Position_Z',f'{tag}_Pitch',f'{tag}_Roll',f'{tag}_Yaw'
                     fieldnames+=tag_header
-                    logger.debug(f'tag header: {tag_header}')
+                    # logger.debug(f'tag header: {tag_header}')
                     tag_data_arr=[*tags[tag].values()]
-                    logger.debug(f'tag data: {tag_data_arr}')
+                    # logger.debug(f'tag data: {tag_data_arr}')
                     assert len(tag_header)==len(tag_data_arr), f"{tag} headers w len {len(tag_header)} isn't equal {len(tag_data_arr)}"
 
                     tag_data_to_be_written={h:d for h,d in zip(tag_header,tag_data_arr)}
@@ -127,20 +125,15 @@ def teardownsession():
     """ writting data """
     temp=open(path_to_temp,'r').read().strip().split("\n\n")
     file_name=None 
-
     data=defaultdict(dict)
     data_pnt=0
     field_headers=[]
-    
-    logger=_LOGGER
-
+   
     # treat each chunk of (spot,mirion,tag1,tag2,..) as a data_block for one data point
     # the first value of a data block will always be spot_time, this will be the time
-    # we sttart taking data,  set this value to be our file name
+    # we start taking data,  set this value to be our file name
     for data_block in temp:
-
         chunk_data=defaultdict(str)
-        
         for header_line,value_line in zip(data_block.split("\n")[::2],data_block.split("\n")[1::2]): 
             for h,v in zip(header_line.split(","),value_line.split(",")):
                 
@@ -154,7 +147,7 @@ def teardownsession():
         data_pnt+=1
         
 
-    #write data to file
+    # write data to official file whose name is the first timestamp of the data acquisition session
     assert file_name!=None, "file_name is NULL"
     path_to_file=os.path.join(path,f"../src/data_acquisitions/data/{file_name}.csv")
     with open(path_to_file, 'w', newline='') as file:
@@ -172,39 +165,12 @@ def teardownsession():
 
 
 
-def finalize_csv(path_to_file,path_to_temp,path_to_header): 
-    try: 
-        headers=open(path_to_header,"r").readlines()[-1]
-    except IndexError: 
-        return 
-    with open(path_to_file,"w+") as g:
-        f=open(path_to_temp,"r")
-        writer = csv.writer(g)
-        g.write(headers+f.read())
          
     
 
 
-def header_storage(path_to_header):
-    """ go thru header file to retrieve header with most items"""
-    f= open(path_to_header,"r").readlines() 
-    max_headers=0 
-    if not f:
-        return []
-    for line in f:
-        line.strip()
-        if max_headers < max(max_headers,len(line.split(','))):
-            max_headers= max(max_headers,len(line.split(',')))
-            headers= line.split(",") 
-    return headers
 
 
-
-def write_headers_to_file(headers_to_be_written,path_to_header): 
-    with open(path_to_header,"a") as f:
-        writer = csv.writer(f)
-        writer.writerow(headers_to_be_written)
-    f.close()
 
 
 
