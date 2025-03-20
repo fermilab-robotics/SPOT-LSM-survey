@@ -85,7 +85,7 @@ class DataAcquisition():
                 self.tag_data[time][f.name].update({'Position Z':tag_position_Z})
 
                 tag_euler_angle=quat_to_Euler(vision[idx])
-                self.tag_data[time][f.name].update({'Picth':tag_euler_angle.pitch})
+                self.tag_data[time][f.name].update({'Pitch':tag_euler_angle.pitch})
                 self.tag_data[time][f.name].update({'Roll':tag_euler_angle.roll})
                 self.tag_data[time][f.name].update({'Yaw':tag_euler_angle.yaw})
 
