@@ -4,7 +4,14 @@
 # is subject to the terms and conditions of the Boston Dynamics Software
 # Development Kit License (20191101-BDSDK-SL).
 
-"""Example of how to talk to the remote mission service examples in this directory."""
+"""This script is used to send gRPC client request to our service 
+    Run this using: 
+        python3 remote_mission_client.py -s SPOT-LSM-svc robot $spot_host
+    - The -s option is to pass in the service that we want to call: SPOT-LSM-svc or DRAIN-history-svc
+    - Default option for -s is SPOT-LSM-svc
+    - Make sure BOSDYN_CLIENT_USER & BOSDYN_CLIENT_PASSWORD & spot_host are exported before executing the code.
+
+"""
 
 import argparse
 import time
@@ -25,7 +32,7 @@ _WHO_KEY = 'who'
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--svc','-s',help='service: SPOT-LSM-svc or DRAIN-TEMP-svc',default='SPOT-LSM-svc')
+    parser.add_argument('--svc','-s',help='service: SPOT-LSM-svc or DRAIN-history-svc',default='SPOT-LSM-svc')
 
     subparsers = parser.add_subparsers(help='Select how this service will be accessed.',
                                        dest='host_type')
