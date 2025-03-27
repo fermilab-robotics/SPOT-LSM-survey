@@ -88,6 +88,8 @@ def main():
         # Establish the session, telling the servicer to perform any one-time tasks.
         try:
             session_id = client.establish_session(lease_resources=lease_resources)
+            #get session's info
+            client.get_service_info()
             
 
         except bosdyn.client.UnimplementedError:
@@ -97,7 +99,7 @@ def main():
 
         # Begin ticking, and tick until the server indicates something other than RUNNING.
         response = client.tick(session_id, lease_resources=lease_resources, params=input_params)
-        print(f'session id {session_id}')
+        
         while response.status == remote_pb2.TickResponse.STATUS_RUNNING:
             time.sleep(0.1)
             response = client.tick(session_id, lease_resources=lease_resources, params=input_params)
