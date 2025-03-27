@@ -26,8 +26,8 @@ from bosdyn.client.service_customization_helpers import (InvalidCustomParamSpecE
 from bosdyn.client.util import setup_logging
 from bosdyn.mission import util
 
-from main_daq import (establish_session,tick,stop,teardownsession,finalize_csv,
-                      main_daq,path_to_file,path_to_header,path_to_temp)
+from main_daq import (establish_session,tick,stop,teardownsession,
+                      main_daq,path_to_temp)
 DIRECTORY_NAME = 'SPOT-LSM-svc'
 AUTHORITY = 'remote-mission-main'
 SERVICE_TYPE = 'bosdyn.api.mission.RemoteMissionService'
@@ -110,6 +110,8 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         response = remote_pb2.GetRemoteMissionServiceInfoResponse()
         with ResponseContext(response, request):
             response.custom_params.CopyFrom(self.custom_params)
+            epoch_time=response.header.request_received_timestamp.seconds
+            self.logger.info(f'Request received timestamp: {datetime.fromtimestamp(epoch_time)}')
         return response
 
 

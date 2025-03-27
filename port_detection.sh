@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# This script is to figure out what port the Mirion USB is running on
 
 for sysdevpath in $(find /sys/bus/usb/devices/usb*/ -name dev); do
     
