@@ -1,24 +1,22 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as builder 
+RUN apt-get update && apt-get install -y git
+WORKDIR /git-install
+RUN git clone --depth 1 https://github.com/fermilab-robotics/AccuRad-PRD.git /git-install
 
-WORKDIR /home/SPOT-LSM-survey
-ENV TZ="America/Chicago"
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-   python3.9-venv  && apt-get clean 
+FROM python:3.9-alpine as base
+WORKDIR /dependencies
+COPY --from=builder /git-install /dependencies
+RUN pip install --no-cache-dir bosdyn-client==3.3.2 bosdyn-mission==3.3.2  --target /install  \ 
+   && pip install . --target /install
 
-RUN python3.9 -m venv /venv
-ENV PATH=/venv/bin:$PATH
-
-COPY requirements.txt /tmp/pip-tmp/
-RUN apt-get install -y git udev
-RUN pip --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-   && rm -rf /tmp/pip-tmp
-
+FROM python:3.9-alpine as run-time 
+COPY --from=base /install /usr/local/lib/python3.9/site-packages/ 
+WORKDIR /SPOT-LSM-survey
 COPY . . 
-RUN chmod +x port_detection.sh entrypoint.sh
-
-ENTRYPOINT ["bash","-c","source ./entrypoint.sh"]
-
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["/bin/sh","-c"]
+CMD ["./entrypoint.sh"]
 
 
 

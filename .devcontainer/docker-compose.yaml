@@ -5,12 +5,10 @@ services:
       context: ../
       dockerfile: .devcontainer/Dockerfile
     container_name: container-spot-lsm
-    restart: always
-    environment:
-      - TZ=America/Chicago
+    restart: unless-stopped
     env_file:
       - .env
-      - .env-2  
+      - .env2  
     volumes:
       - /home/lpham/CODE/SPOT-LSM-survey/src/data_acquisitions/data:/home/SPOT-LSM-survey/src/data_acquisitions/data
       - /run/udev:/run/udev:ro
@@ -18,19 +16,16 @@ services:
       - /dev/ttyACM0:/dev/ttyACM0
     network_mode: host
     privileged: true
-    command: ${test_ip} ${spot_host}
-
-    #uncomment two lines below to exec into the containe for debugging
-    # entrypoint: [ "/bin/bash", "-c" ]
-    # command: [ "while true; do sleep 30; done;" ]
    
-  drain-temp-file:
-    image: spot-drain-temp
+  drain-history:
+    image: spot-drain-history
     build:
       context: ../
       dockerfile: .devcontainer/Dockerfile2
-    container_name: drain-temp-container
+    container_name: drain-history-container
     env_file:
-      - .env-2
-    command: ${spot_host}
+      - .env
+      - .env2
+    network_mode: host
     restart: unless-stopped
+    
