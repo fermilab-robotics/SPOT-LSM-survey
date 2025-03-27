@@ -1,28 +1,31 @@
 services:
   spot-lsm:
     image: spot-mirion
+    build:
+      context: ../
+      dockerfile: .devcontainer/Dockerfile
     container_name: container-spot-lsm
-    restart: always
-    environment:
-      - TZ=America/Chicago
-      - BOSDYN_CLIENT_USERNAME=linhphambuzz
-      - BOSDYN_CLIENT_PASSWORD=DogWalker244
-      - spot_host=192.168.50.3
+    restart: unless-stopped
     env_file:
       - .env
+      - .env2  
     volumes:
-      - /home/lpham/CODE/SPOT-LSM-survey:/home/SPOT-LSM-survey
       - /home/lpham/CODE/SPOT-LSM-survey/src/data_acquisitions/data:/home/SPOT-LSM-survey/src/data_acquisitions/data
-      #mounting usb bus for the digitizer
       - /run/udev:/run/udev:ro
       - /dev/bus/usb:/dev/bus/usb
       - /dev/ttyACM0:/dev/ttyACM0
     network_mode: host
-    ports:
-      - "5000:5000"
     privileged: true
-    command: ${test_ip} ${spot_host}
-    #uncomment two lines below to exec into the containe for debugging
-    #entrypoint: [ "/bin/bash", "-c" ]
-    #command: [ "while true; do sleep 30; done;" ]
+   
+  drain-history:
+    image: spot-drain-history
+    build:
+      context: ../
+      dockerfile: .devcontainer/Dockerfile2
+    container_name: drain-history-container
+    env_file:
+      - .env
+      - .env2
+    network_mode: host
+    restart: unless-stopped
     

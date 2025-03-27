@@ -4,10 +4,18 @@
 # is subject to the terms and conditions of the Boston Dynamics Software
 # Development Kit License (20191101-BDSDK-SL).
 
-"""Example of how to talk to the remote mission service examples in this directory."""
+"""This script is used to send gRPC client request to our service 
+    Run this using: 
+        python3 remote_mission_client.py -s SPOT-LSM-svc robot $spot_host
+    - The -s option is to pass in the service that we want to call: SPOT-LSM-svc or DRAIN-history-svc
+    - Default option for -s is SPOT-LSM-svc
+    - Make sure BOSDYN_CLIENT_USER & BOSDYN_CLIENT_PASSWORD & spot_host are exported before executing the code.
+
+"""
 
 import argparse
 import time
+import logging
 from contextlib import ExitStack
 
 import grpc
@@ -18,19 +26,13 @@ import bosdyn.mission.remote_client
 from bosdyn.api import service_customization_pb2
 from bosdyn.api.mission import remote_pb2
 
-
+logger= logging.getLogger(__name__)
 _WHO_KEY = 'who'
 
 
 def main():
     parser = argparse.ArgumentParser()
-    # group = parser.add_mutually_exclusive_group(required=True)
-    # group.add_argument('--hello-world', action='store_true',
-    #                    help='Target the Hello World remote mission service.')
-   
-    # parser.add_argument(
-    #     '--user-string',
-    #     help='Specify the user-string input to Tick. Set to the node name in Autowalk missions.')
+    parser.add_argument('--svc','-s',help='service: SPOT-LSM-svc or DRAIN-history-svc',default='SPOT-LSM-svc')
 
     subparsers = parser.add_subparsers(help='Select how this service will be accessed.',
                                        dest='host_type')
@@ -44,8 +46,9 @@ def main():
 
     options = parser.parse_args()
 
+    #directoy name is the svc registered with the gRPC server
+    directory_name = options.svc
 
-    directory_name = 'hello-world-callback'
     lease_resources = ()
 
 
@@ -58,9 +61,11 @@ def main():
     # Else if attempting to communicate through the robot.
     else:
         # Register the remote mission client with the SDK instance.
-        sdk = bosdyn.client.create_standard_sdk('RemoteMissionClientExample')
+        sdk = bosdyn.client.create_standard_sdk(directory_name)
         sdk.register_service_client(bosdyn.mission.remote_client.RemoteClient,
                                     service_name=directory_name)
+        
+        print(f'service name:{directory_name}')
 
         robot = sdk.create_robot(options.hostname)
         bosdyn.client.util.authenticate(robot)
@@ -83,6 +88,8 @@ def main():
         # Establish the session, telling the servicer to perform any one-time tasks.
         try:
             session_id = client.establish_session(lease_resources=lease_resources)
+            #get session's info
+            client.get_service_info()
             
 
         except bosdyn.client.UnimplementedError:
@@ -92,6 +99,7 @@ def main():
 
         # Begin ticking, and tick until the server indicates something other than RUNNING.
         response = client.tick(session_id, lease_resources=lease_resources, params=input_params)
+        
         while response.status == remote_pb2.TickResponse.STATUS_RUNNING:
             time.sleep(0.1)
             response = client.tick(session_id, lease_resources=lease_resources, params=input_params)
