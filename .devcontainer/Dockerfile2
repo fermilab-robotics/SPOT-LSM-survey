@@ -5,10 +5,11 @@ RUN pip install --no-cache-dir bosdyn-client==3.3.2 bosdyn-mission==3.3.2 --targ
 
 FROM python:3.9-alpine 
 WORKDIR /SPOT-LSM-survey
+ENV TZ=America/Chicago
 COPY --from=builder /spot-api /usr/local/lib/python3.9/site-packages/ 
 COPY . .
 ENTRYPOINT ["/bin/sh","-c"]
-CMD ["python3 src/drain-history.py --port 3000 --host-ip ${host_ip} ${spot_host}"]
+CMD ["python3 src/drain-history.py --port 3000 --host-ip void ${spot_host}"]
 
 
 
