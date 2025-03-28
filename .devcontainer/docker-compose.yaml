@@ -8,9 +8,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-      - .env2  
     volumes:
-      - /home/lpham/CODE/SPOT-LSM-survey/src/data_acquisitions/data:/home/SPOT-LSM-survey/src/data_acquisitions/data
+      - /home/lpham/CODE/SPOT-LSM-survey/src/data_acquisitions/data:/SPOT-LSM-survey/src/data_acquisitions/data
       - /run/udev:/run/udev:ro
       - /dev/bus/usb:/dev/bus/usb
       - /dev/ttyACM0:/dev/ttyACM0
@@ -23,9 +22,10 @@ services:
       context: ../
       dockerfile: .devcontainer/Dockerfile2
     container_name: drain-history-container
+    volumes:
+      - /home/lpham/CODE/SPOT-LSM-survey/src/data_acquisitions/data:/SPOT-LSM-survey/src/data_acquisitions/data
     env_file:
       - .env
-      - .env2
     network_mode: host
     restart: unless-stopped
     
