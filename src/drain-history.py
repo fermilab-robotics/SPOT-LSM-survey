@@ -26,6 +26,9 @@ from bosdyn.client.service_customization_helpers import (InvalidCustomParamSpecE
 from bosdyn.client.util import setup_logging
 from bosdyn.mission import util
 
+from bosdyn.client.common import get_self_ip
+
+
 DIRECTORY_NAME = 'DRAIN-history-svc'
 AUTHORITY = 'remote-mission'
 SERVICE_TYPE = 'bosdyn.api.mission.RemoteMissionService'
@@ -140,7 +143,9 @@ if __name__ == '__main__':
     # Use a keep alive to register the service with the robot directory.
     dir_reg_client = robot.ensure_client(DirectoryRegistrationClient.default_service_name)
     keep_alive = DirectoryRegistrationKeepAlive(dir_reg_client, logger=_LOGGER)
-    keep_alive.start(DIRECTORY_NAME, SERVICE_TYPE, AUTHORITY, options.host_ip, service_runner.port)
+    
+    host_ip= get_self_ip(os.getenv("spot_host"))
+    keep_alive.start(DIRECTORY_NAME, SERVICE_TYPE, AUTHORITY, host_ip, service_runner.port)
 
     # at the end of session, combine finalized headers with data. 
     with keep_alive:
