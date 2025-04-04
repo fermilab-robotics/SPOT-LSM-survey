@@ -94,6 +94,8 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         with ResponseContext(response, request):
             self.logger.info('Writting data to temp file')
             stop(self.data)
+            teardownsession()
+            self.logger.info(f'Writting data to csv file\n End of one request\n\n')
             response.status = remote_pb2.StopResponse.STATUS_OK
         return response
 
@@ -101,8 +103,8 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         response = remote_pb2.TeardownSessionResponse()
         print("--------------------TeardownSession--------------------")
         with ResponseContext(response, request):
-            teardownsession()
-            self.logger.info(f'Writting data to csv file\n End of one request\n\n')
+            #teardownsession()
+            self.logger.info(f'Tear down called\n\n')
             response.status = remote_pb2.TeardownSessionResponse.STATUS_OK
         return response
 
@@ -111,7 +113,7 @@ class HelloWorldServicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         with ResponseContext(response, request):
             response.custom_params.CopyFrom(self.custom_params)
             epoch_time=response.header.request_received_timestamp.seconds
-            self.logger.info(f'Request received timestamp: {datetime.fromtimestamp(epoch_time)}')
+            #self.logger.info(f'Request received timestamp: {datetime.fromtimestamp(epoch_time)}')
         return response
 
 

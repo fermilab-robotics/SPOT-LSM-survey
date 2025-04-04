@@ -107,7 +107,7 @@ class HelloWorld2Servicer(remote_service_pb2_grpc.RemoteMissionServiceServicer):
         with ResponseContext(response, request):
             response.custom_params.CopyFrom(self.custom_params)
             epoch_time=response.header.request_received_timestamp.seconds
-            self.logger.info(f'Request received timestamp: {datetime.fromtimestamp(epoch_time)}')
+            #self.logger.info(f'Request received timestamp: {datetime.fromtimestamp(epoch_time)}')
         return response
 
 
